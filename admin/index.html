@@ -1,0 +1,902 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>Milk Distributor ERP – Simple & Fast</title>
+<!-- SheetJS for real .xlsx Excel generation & reading -->
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<style>
+:root{--bg:#f8faf8;--sf:#ffffff;--tx:#111827;--mu:#64748b;--bd:#e2e8f0;--g:#14532d;--gl:#dcfce7;--gdark:#0f3f22;--rd:#b91c1c;--rl:#fee2e2;--am:#b45309;--al:#fef3c7;box-sizing:border-box}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f172a;--sf:#1e293b;--tx:#f8fafc;--mu:#94a3b8;--bd:#334155;--g:#22c55e;--gl:#14532d;--gdark:#15803d;--rd:#f87171;--rl:#450a0a;--am:#fbbf24;--al:#451a03;color-scheme:dark}}
+*{box-sizing:border-box}html,body{margin:0}body{background:var(--bg);color:var(--tx);font:14px/1.4 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+.app{display:flex;min-height:100vh}
+.side{width:230px;background:var(--sf);border-right:1px solid var(--bd);padding:16px 10px;flex:none;display:flex;flex-direction:column;gap:6px}
+.logo{font-weight:800;color:var(--g);padding:6px 12px 14px;font-size:16px;border-bottom:1px solid var(--bd);margin-bottom:6px;display:flex;align-items:center;gap:8px}
+.side a{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:8px;color:var(--tx);cursor:pointer;font-weight:500;text-decoration:none;transition:background .15s}
+.side a:hover{background:var(--bg)}.side a.on{background:var(--g);color:#fff;font-weight:700}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]) .side a.on{color:#052e16}}
+main{flex:1;min-width:0;padding:20px 24px}
+h1{font-size:22px;font-weight:800;margin:0 0 4px;color:var(--tx)}.sub{color:var(--mu);margin:0 0 16px;font-size:13px}
+.bar{display:flex;gap:10px;flex-wrap:wrap;align-items:end;margin-bottom:16px}
+label{font-size:12px;font-weight:600;color:var(--mu);display:flex;flex-direction:column;gap:4px}
+input,select,button{font:inherit;color:var(--tx);background:var(--sf);border:1px solid var(--bd);border-radius:8px;padding:8px 12px}button{cursor:pointer;font-weight:600}
+button.p{background:var(--g);border-color:var(--g);color:#fff;box-shadow:0 1px 2px rgba(0,0,0,0.05)}button.p:hover{opacity:.92}
+button.s{padding:4px 10px;font-size:12px;border-radius:6px}button.danger{background:var(--rd);border-color:var(--rd);color:#fff}
+.action-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-bottom:20px}
+.action-btn{display:flex;align-items:center;gap:12px;background:var(--sf);border:1px solid var(--bd);border-radius:12px;padding:14px 16px;cursor:pointer;text-align:left;transition:all .15s;text-decoration:none;color:var(--tx)}
+.action-btn:hover{border-color:var(--g);transform:translateY(-1px);box-shadow:0 4px 6px -1px rgba(0,0,0,0.05)}
+.action-btn .icon{font-size:28px}
+.action-btn .tit{font-size:14px;font-weight:700;display:block}
+.action-btn .desc{font-size:11px;color:var(--mu)}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:20px}
+.card{background:var(--sf);border:1px solid var(--bd);border-radius:12px;padding:14px 16px;box-shadow:0 1px 2px rgba(0,0,0,0.02)}
+.card span{color:var(--mu);font-size:12px;font-weight:600;display:block;margin-bottom:4px}
+.card b{font-size:24px;font-weight:800;color:var(--g);display:block}
+.card.bad b{color:var(--rd)}.card.amber b{color:var(--am)}
+.tw{overflow:auto;border:1px solid var(--bd);border-radius:10px;background:var(--sf);max-height:74vh;box-shadow:0 1px 2px rgba(0,0,0,0.02)}
+table{border-collapse:separate;border-spacing:0;width:100%}
+th,td{padding:8px 10px;border-bottom:1px solid var(--bd);border-right:1px solid var(--bd);text-align:right;white-space:nowrap;font-size:13px}
+th{background:var(--gl);position:sticky;top:0;z-index:2;font-size:12px;font-weight:700;color:var(--tx)}
+th.l,td.l{text-align:left}.reg .st{position:sticky;left:0;background:var(--sf);z-index:1;text-align:left;min-width:170px}
+.reg th.st{background:var(--gl);z-index:3}.reg small{display:block;color:var(--mu);font-size:11px}
+.reg input{width:65px;text-align:right;padding:4px 6px;border-radius:4px;font-weight:700}
+.reg input.e{background:repeating-linear-gradient(45deg,#f1f5f9,#f1f5f9 4px,var(--sf) 4px,var(--sf) 8px)}
+.g{border-left:2px solid var(--g)}tfoot td{position:sticky;bottom:0;background:var(--gl);font-weight:700}
+.pill{display:inline-block;padding:2px 8px;border-radius:99px;font-size:11px;font-weight:700;background:var(--gl);color:var(--g)}
+.pill.r{background:var(--rl);color:var(--rd)}.pill.a{background:var(--al);color:var(--am)}
+.box{background:var(--sf);border:1px solid var(--bd);border-radius:10px;padding:16px;margin-bottom:16px}
+.bill{max-width:620px;background:#fff;color:#111;border:1px solid #ccc;padding:18px;border-radius:8px}
+dialog{border:1px solid var(--bd);border-radius:12px;background:var(--sf);color:var(--tx);max-width:400px;width:92%;padding:20px}
+#toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--g);color:#fff;padding:10px 18px;border-radius:99px;display:none;z-index:99;font-weight:600;box-shadow:0 10px 15px -3px rgba(0,0,0,0.1)}
+@media(max-width:760px){.app{flex-direction:column}.side{width:100%;flex-direction:row;overflow-x:auto;padding:8px}.logo{display:none}.side a{white-space:nowrap;padding:8px 10px}main{padding:14px}}
+@media print{.side,.bar,button{display:none!important}.tw{max-height:none}}
+</style></head><body><div class="app"><nav class="side" id="nav"></nav><main id="main"></main></div><dialog id="dlg"></dialog><div id="toast"></div>
+<script>
+const TODAY = new Date().toISOString().slice(0,10), BR = ['Gokul','Chitale','Amul','Shivanand'], KEY = 'milkerp_crate_v2';
+const $ = s => document.querySelector(s), esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const addD = (d, n) => { const x = new Date(d + 'T00:00:00Z'); x.setUTCDate(x.getUTCDate() + n); return x.toISOString().slice(0, 10); };
+const fd = d => d.slice(8) + '/' + d.slice(5, 7), sum = (a, k) => a.reduce((x, t) => x + (+t[k] || 0), 0), inr = n => '₹' + Math.round(n).toLocaleString('en-IN');
+
+// Simplified 8 Core Modules instead of 12 cluttered ones
+const PAGES = ['Dashboard','Daily Register','Monthly Excel Sheet','Daily Bills','Payments & Jama','Crate Management','Retailers & Rates','Settings & Backup'];
+const KEYS = ['dash','reg','mon','bill','pay','crate','ret','set'];
+const MR = ['डॅशबोर्ड','दैनिक नोंदवही','मासिक Excel शीट','दैनिक बिल','पेमेंट व जमा','क्रेट हिशोब','विक्रेते व दर','सेटिंग्ज व बॅकअप'];
+
+let S, page = 'dash', D = TODAY, BL = 'R101', MM = TODAY.slice(0, 7), MR2 = 'R101';
+
+function seed() {
+  const prod = [
+    { id: 'gf', brand: 'Gokul', name: 'FC 500ml', mr: 'गोकुळ फुल क्रीम', cap: 12, rate: 71.3 },
+    { id: 'gc', brand: 'Gokul', name: 'Cow 500ml', mr: 'गोकुळ काऊ', cap: 10, rate: 53 },
+    { id: 'cf', brand: 'Chitale', name: 'FC 500ml', mr: 'चितळे फुल क्रीम', cap: 12, rate: 71 },
+    { id: 'cc', brand: 'Chitale', name: 'Cow 500ml', mr: 'चितळे काऊ', cap: 12, rate: 55 },
+    { id: 'ct', brand: 'Chitale', name: 'Tea Special', mr: 'चितळे स्पेशल टी', cap: 12, rate: 65 },
+    { id: 'at', brand: 'Amul', name: 'Taaza 500ml', mr: 'अमूल ताजा', cap: 12, rate: 55 },
+    { id: 'ag', brand: 'Amul', name: 'Gold 500ml', mr: 'अमूल गोल्ड', cap: 12, rate: 65 },
+    { id: 'st', brand: 'Shivanand', name: 'Tond 500ml', mr: 'श्रीनंद टोन्ड', cap: 10, rate: 36 },
+    { id: 'ss', brand: 'Shivanand', name: 'SPL 500ml', mr: 'श्रीनंद स्पेशल', cap: 10, rate: 37 },
+    { id: 'ns', brand: 'Nature', name: 'Standard', mr: 'नेचर स्टँडर्ड', cap: 12, rate: 50 },
+    { id: 'nd2', brand: 'Nature', name: 'Dahi 200g', mr: 'नेचर दही २००g', cap: 12, rate: 74 },
+    { id: 'gvc', brand: 'Govind', name: 'Cow 500ml', mr: 'गोविंद काऊ', cap: 12, rate: 49.5 },
+    { id: 'gvs', brand: 'Govind', name: 'Standard', mr: 'गोविंद स्टँडर्ड', cap: 12, rate: 51 },
+    { id: 'gd2', brand: 'Govind', name: 'Dahi 200g', mr: 'गोविंद दही २००g', cap: 12, rate: 66.85 },
+    { id: 'gt', brand: 'Govind', name: 'Tak', mr: 'गोविंद ताक', cap: 12, rate: 31 },
+    { id: 'thc', brand: 'Thorat', name: 'Cow 500ml', mr: 'थोरात काऊ', cap: 10, rate: 52.7 },
+    { id: 'wfc', brand: 'Warna', name: 'FC 500ml', mr: 'वारणा फुल क्रीम', cap: 12, rate: 56 }
+  ];
+
+  const customers = [
+    { id: 'R101', name: 'प्रवीण कदम (Pravin Kadam)', route: 'Kothrud', mob: '9822011223', prevOut: 199587 },
+    { id: 'R102', name: 'ओवी गायकवाड (Ovi Gaikwad)', route: 'Hadapsar', mob: '9822044556', prevOut: 75520 },
+    { id: 'R103', name: 'प्रफुल (Praful Dairy)', route: 'Baner', mob: '9822077889', prevOut: 346188 },
+    { id: 'R104', name: 'आबा तिखे (Aaba Tikhe)', route: 'Wakad', mob: '9822099001', prevOut: 184300 },
+    { id: 'R105', name: 'विनोद बिरादार (Vinod Biradar)', route: 'Hadapsar', mob: '9822022334', prevOut: 259475 },
+    { id: 'R106', name: 'तुनतुने (Tuntune)', route: 'Kothrud', mob: '9822055667', prevOut: 85394 },
+    { id: 'R107', name: 'सुनील ठानगे (Sunil Thange)', route: 'Baner', mob: '9822088990', prevOut: 264961 },
+    { id: 'R108', name: 'ठाकूर मामा (Thakur Mama)', route: 'Wakad', mob: '9822011002', prevOut: 72630 },
+    { id: 'R109', name: 'आप्पा बराटे (Appa Barate)', route: 'Kothrud', mob: '9822033445', prevOut: 0 },
+    { id: 'R110', name: 'संतोष आव्हाळे (Santosh Awhale)', route: 'Hadapsar', mob: '9822066778', prevOut: 47750 },
+    { id: 'R111', name: 'तरटे (Tarte)', route: 'Baner', mob: '9822099112', prevOut: 0 },
+    { id: 'R112', name: 'आतिश दिवेकर (Aatish Divekar)', route: 'Wakad', mob: '9822022446', prevOut: 0 },
+    { id: 'R113', name: 'अरुण/दिलीप-झेन सर कंपनी', route: 'Kothrud', mob: '9822055779', prevOut: 150745 }
+  ];
+
+  const ret = customers.map(c => ({
+    ...c,
+    open: { Gokul: 10, Chitale: 8, Amul: 4, Shivanand: 2 }
+  }));
+
+  const o = {};
+  o[TODAY] = {
+    R101: { gf: 477, gc: 30, cf: 105, cc: 171.5, ss: 31, ns: 20, nd2: 12, gt: 10, ag: 30 },
+    R102: { gf: 380, gc: 50 },
+    R103: { cf: 204, cc: 300 },
+    R104: { cf: 144, cc: 168 },
+    R105: { cf: 168, cc: 312 },
+    R106: { cf: 132 },
+    R107: { cf: 204, cc: 168 },
+    R108: { cf: 180, cc: 240 }
+  };
+
+  const tx = [];
+  let id = 1;
+  ret.forEach(r => {
+    BR.forEach(b => {
+      tx.push({ id: id++, date: TODAY, r: r.id, b, iss: 4, ret: 2, cap: 12, src: 'register', void: 0 });
+    });
+  });
+
+  const pay = [
+    { id: id++, date: TODAY, r: 'R101', amt: 22000, m: 'Cash', ref: 'Cash hand', al: 'Account', void: 0 },
+    { id: id++, date: TODAY, r: 'R102', amt: 27770, m: 'Online', ref: 'UPI-481920', al: 'Account', void: 0 },
+    { id: id++, date: TODAY, r: 'R103', amt: 50160, m: 'Cash', ref: 'Cash hand', al: 'Account', void: 0 }
+  ];
+
+  return {
+    prod,
+    ret,
+    tx,
+    orders: o,
+    pay,
+    audit: [],
+    seq: id + 50,
+    cfg: { hi: 25, days: 5, dep: 0, mr: 0, cut: '18:00', biz: 'निखिल दुध डेअरी (Nikhil Milk Dairy Pune)', pre: 'INV', pm: 'Cash,Online,Cheque' }
+  };
+}
+
+function load() {
+  try {
+    const v = localStorage.getItem(KEY);
+    return v ? JSON.parse(v) : null;
+  } catch(e) { return null; }
+}
+
+function save() {
+  try {
+    localStorage.setItem(KEY, JSON.stringify(S));
+    syncToPostgres();
+  } catch(e) {}
+}
+
+async function syncToPostgres() {
+  try {
+    await fetch('http://localhost:8000/api/sync', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ prod: S.prod, ret: S.ret, cfg: S.cfg })
+    });
+  } catch(e) {}
+}
+
+S = load() || seed();
+fix();
+
+const toast = m => {
+  const t = $('#toast');
+  t.textContent = trs(m);
+  t.style.display = 'block';
+  clearTimeout(t.h);
+  t.h = setTimeout(() => t.style.display = 'none', 2500);
+};
+
+// Pure calculations
+const act = () => S.tx.filter(t => !t.void), RT = id => S.ret.find(r => r.id == id) || { name: id, route: '', open: {}, prevOut: 0 }, brandCap = b => { const p = S.prod.find(p => p.brand == b); return p ? p.cap : 12; };
+const bal = (r, b, d, inc) => { const rt = RT(r); return (rt.open && rt.open[b] || 0) + act().filter(t => t.r == r && t.b == b && (inc ? t.date <= d : t.date < d)).reduce((a, t) => a + t.iss - t.ret, 0); };
+const day = (r, b, d) => { const T = act().filter(t => t.r == r && t.b == b && t.date == d), iss = sum(T, 'iss'), rt = sum(T, 'ret'), o = bal(r, b, d); return { o, iss, rt, c: o + iss - rt }; };
+const ord = (r, p) => (S.orders[D] && S.orders[D][r] && S.orders[D][r][p]);
+const rate = (p, d) => (S.snap && S.snap[d] && S.snap[d][p.id]) || p.rate;
+const line = (r, d) => S.prod.map(p => ({ p, q: ((S.orders[d] || {})[r] || {})[p.id] || 0, rt: rate(p, d) })).filter(x => x.q);
+const billed = (r, d) => line(r, d).reduce((a, x) => a + x.q * x.rt, 0);
+const paid = (r, d) => S.pay.filter(x => x.r == r && !x.void && (!d || x.date == d)).reduce((a, x) => a + x.amt, 0);
+const allb = r => Object.keys(S.orders).reduce((a, d) => a + billed(r, d), 0);
+const outst = r => (RT(r).prevOut || 0) + allb(r) - paid(r);
+const fb = n => n < 0 ? '<span class="pill a">Advance ' + inr(-n) + '</span>' : inr(n);
+const coR = (r, d) => (RT(r).prevOut || 0) + Object.keys(S.orders).filter(x => x <= d).reduce((a, x) => a + billed(r, x), 0) - S.pay.filter(x => x.r == r && !x.void && x.date <= d).reduce((a, x) => a + x.amt, 0);
+
+function fix() {
+  S.prod = S.prod || seed().prod;
+  S.ret = S.ret || seed().ret;
+  S.orders = S.orders || {};
+  S.pay = S.pay || [];
+  S.tx = S.tx || [];
+  S.cfg = S.cfg || seed().cfg;
+  S.cfg.biz = S.cfg.biz || 'निखिल दुध डेअरी (Pune)';
+}
+
+// Shell Sidebar Navigation
+function go() {
+  $('#nav').innerHTML = `
+    <div class="logo">🥛 <span>Milk ERP</span></div>
+    <a onclick="S.cfg.mr=S.cfg.mr?0:1;save();go()">🌐 English / मराठी</a>
+    ${PAGES.map((p, i) => `
+      <a class="${KEYS[i] == page ? 'on' : ''}" onclick="nav('${KEYS[i]}')">
+        <span>${['📊','📋','📈','🧾','💰','📦','🏪','⚙️'][i]}</span>
+        <span>${S.cfg.mr ? MR[i] : p}</span>
+      </a>
+    `).join('')}
+  `;
+  const f = { dash: pDash, reg: pReg, mon: pMon, bill: pBill, pay: pPay, crate: pCrate, ret: pRet, set: pSet }[page];
+  $('#main').innerHTML = f();
+  tr($('#nav'));
+  tr($('#main'));
+  if (page == 'reg') refresh();
+}
+const nav = p => { page = p; go(); };
+
+// ==========================================
+// 1. SIMPLE & CLEAN DASHBOARD
+// ==========================================
+function pDash() {
+  // Key Metrics
+  const todaySales = S.ret.reduce((a, r) => a + billed(r.id, TODAY), 0);
+  const todayPouches = S.ret.reduce((a, r) => a + S.prod.reduce((x, p) => x + (ord(r.id, p.id) || 0), 0), 0);
+  const todayPaidCash = S.pay.filter(x => x.date == TODAY && !x.void && x.m == 'Cash').reduce((a, x) => a + x.amt, 0);
+  const todayPaidOnline = S.pay.filter(x => x.date == TODAY && !x.void && x.m != 'Cash').reduce((a, x) => a + x.amt, 0);
+  const totalMarketDue = S.ret.reduce((a, r) => a + Math.max(0, outst(r.id)), 0);
+  const totalCratesOut = S.ret.reduce((a, r) => a + BR.reduce((x, b) => x + bal(r.id, b, TODAY, 1), 0), 0);
+
+  return `
+    <h1>${S.cfg.mr ? 'डॅशबोर्ड' : 'Business Dashboard'}</h1>
+    <p class="sub">${new Date().toLocaleDateString(S.cfg.mr ? 'mr-IN' : 'en-IN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })} • Pune</p>
+
+    <!-- 4 BIG CLEAN CARDS -->
+    <div class="cards">
+      <div class="card">
+        <span>${S.cfg.mr ? 'आजची दूध विक्री (रक्कम)' : "Today's Milk Sales"}</span>
+        <b>${inr(todaySales)}</b>
+        <small style="color:var(--mu)">${todayPouches} pouches delivered</small>
+      </div>
+      <div class="card">
+        <span>${S.cfg.mr ? 'आज जमा रक्कम (वसुली)' : "Today's Total Jama"}</span>
+        <b style="color:#16a34a">${inr(todayPaidCash + todayPaidOnline)}</b>
+        <small style="color:var(--mu)">Cash: ${inr(todayPaidCash)} • Online: ${inr(todayPaidOnline)}</small>
+      </div>
+      <div class="card bad">
+        <span>${S.cfg.mr ? 'मार्केटमधील एकूण येणे बाकी' : 'Total Market Outstanding'}</span>
+        <b>${inr(totalMarketDue)}</b>
+        <small style="color:var(--mu)">Across all ${S.ret.length} customers</small>
+      </div>
+      <div class="card amber">
+        <span>${S.cfg.mr ? 'मार्केटमधील एकूण क्रेट' : 'Crates with Retailers'}</span>
+        <b>${totalCratesOut}</b>
+        <small style="color:var(--mu)">Gokul, Chitale, Amul, Shivanand</small>
+      </div>
+    </div>
+
+    <!-- 4 BIG FAST-ACTION BUTTONS -->
+    <div class="action-grid">
+      <div class="action-btn" onclick="nav('reg')">
+        <span class="icon">📋</span>
+        <div>
+          <span class="tit">${S.cfg.mr ? 'दैनिक नोंदवही' : 'Daily Register'}</span>
+          <span class="desc">${S.cfg.mr ? 'आजचे दूध व क्रेट भरा' : "Fill today's milk & crates"}</span>
+        </div>
+      </div>
+      <div class="action-btn" onclick="nav('mon')">
+        <span class="icon">📈</span>
+        <div>
+          <span class="tit">${S.cfg.mr ? 'मासिक Excel शीट' : 'Customer Excel Sheet'}</span>
+          <span class="desc">${S.cfg.mr ? 'दिवसवार आपोआप हिशोब व डाउनलोड' : 'Auto daily rows & 1-click Excel'}</span>
+        </div>
+      </div>
+      <div class="action-btn" onclick="nav('bill')">
+        <span class="icon">🧾</span>
+        <div>
+          <span class="tit">${S.cfg.mr ? 'दैनिक बिल पाठवा' : "Send Daily Bill"}</span>
+          <span class="desc">${S.cfg.mr ? 'WhatsApp साठी इमेज डाउनलोड' : '1-click WhatsApp bill image'}</span>
+        </div>
+      </div>
+      <div class="action-btn" onclick="nav('pay')">
+        <span class="icon">💰</span>
+        <div>
+          <span class="tit">${S.cfg.mr ? 'पेमेंट नोंदवा (जमा)' : 'Record Payment / Jama'}</span>
+          <span class="desc">${S.cfg.mr ? 'रोख किंवा ऑनलाईन पावती' : 'Cash or Online collection receipt'}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- SIMPLE TODAY'S SNAPSHOT TABLE -->
+    <div class="box">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+        <b style="font-size:15px">${S.cfg.mr ? 'आजचा ग्राहक सारांश' : "Today's Customer Snapshot"}</b>
+        <span style="font-size:12px;color:var(--mu)">Auto updates from Daily Register & Payments</span>
+      </div>
+      <div class="tw">
+        <table>
+          <thead>
+            <tr>
+              <th class="l">Customer (ग्राहक)</th>
+              <th>Route (मार्ग)</th>
+              <th>Today Milk (आजचे दूध)</th>
+              <th>Today Sale (आजचे बिल)</th>
+              <th>Paid Today (आज जमा)</th>
+              <th>Balance Pending (शिल्लक बाकी)</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            ${S.ret.map(r => {
+              const bAmt = billed(r.id, TODAY);
+              const pAmt = paid(r.id, TODAY);
+              const due = outst(r.id);
+              return `
+                <tr>
+                  <td class="l"><b>${esc(r.name)}</b></td>
+                  <td>${r.route}</td>
+                  <td>${S.prod.reduce((x, p) => x + (ord(r.id, p.id) || 0), 0)} pcs</td>
+                  <td><b>${inr(bAmt)}</b></td>
+                  <td style="color:#16a34a">${pAmt ? inr(pAmt) : '–'}</td>
+                  <td class="${due > 0 ? 'neg' : ''}"><b>${inr(due)}</b></td>
+                  <td><button class="s" onclick="MR2='${r.id}';nav('mon')">View Excel</button></td>
+                </tr>
+              `;
+            }).join('')}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  `;
+}
+
+// ==========================================
+// 2. DAILY REGISTER
+// ==========================================
+function pReg() {
+  const P = S.prod;
+  let h = `
+    <h1>Daily Register</h1>
+    <p class="sub">Enter milk quantities and crate movements. Entering values here advances your customer Excel sheets automatically.</p>
+    <div class="bar">
+      <label>Date<input type="date" id="dt" value="${D}" onchange="D=this.value;go()"></label>
+      <button class="p" onclick="exportRegXLSX()">⬇ Download Register (.xlsx)</button>
+      <button onclick="window.print()">Print</button>
+    </div>
+    <div class="tw"><table class="reg" id="reg"><thead>
+      <tr>
+        <th class="st" rowspan="2">Customer</th>
+        <th colspan="${P.length}">Ordered Pouches</th>
+        ${BR.map(b => `<th colspan="4" class="g">${b} Crates</th>`).join('')}
+      </tr>
+      <tr>
+        ${P.map(p => `<th>${p.name}</th>`).join('')}
+        ${BR.map(() => '<th class="g">Open</th><th>Issued</th><th>Returned</th><th>Close</th>').join('')}
+      </tr>
+    </thead><tbody>
+  `;
+  S.ret.forEach((r, i) => {
+    h += `<tr><td class="st">${esc(r.name)}<small>${r.route}</small></td>`;
+    P.forEach((p, j) => {
+      const v = ord(r.id, p.id);
+      h += `<td><input type="number" min="0" step="any" class="${v == null ? 'e' : ''}" value="${v == null ? '' : v}" data-t="q" data-id="${r.id}" data-x="${p.id}" data-r="${i}" data-c="${j}"></td>`;
+    });
+    BR.forEach((b, k) => {
+      const x = day(r.id, b, D), c = P.length + k * 2;
+      h += `<td class="g" id="o_${r.id}_${b}"></td><td><input type="number" min="0" value="${x.iss || ''}" data-t="i" data-id="${r.id}" data-x="${b}" data-r="${i}" data-c="${c}" id="i_${r.id}_${b}"></td><td><input type="number" min="0" value="${x.rt || ''}" data-t="r" data-id="${r.id}" data-x="${b}" data-r="${i}" data-c="${c + 1}"></td><td id="c_${r.id}_${b}"></td>`;
+    });
+    h += '</tr>';
+  });
+  h += `</tbody><tfoot><tr><td class="st">TOTAL</td>${P.map(p => `<td id="tq_${p.id}"></td>`).join('')}${BR.map(b => `<td class="g" id="to_${b}"></td><td id="ti_${b}"></td><td id="tr_${b}"></td><td id="tc_${b}"></td>`).join('')}</tr></tfoot></table></div>`;
+  return h;
+}
+
+function refresh() {
+  const T = {};
+  BR.forEach(b => T[b] = [0, 0, 0, 0]);
+  S.ret.forEach(r => BR.forEach(b => {
+    const x = day(r.id, b, D), q = S.prod.filter(p => p.brand == b).reduce((a, p) => a + Math.ceil((ord(r.id, p.id) || 0) / p.cap), 0);
+    $('#o_' + r.id + '_' + b).textContent = x.o;
+    const c = $('#c_' + r.id + '_' + b);
+    c.textContent = x.c;
+    c.className = x.c < 0 ? 'neg' : '';
+    $('#i_' + r.id + '_' + b).placeholder = q || '';
+    [x.o, x.iss, x.rt, x.c].forEach((v, i) => T[b][i] += v);
+  }));
+  S.prod.forEach(p => {
+    const t = S.ret.reduce((a, r) => a + (ord(r.id, p.id) || 0), 0);
+    $('#tq_' + p.id).innerHTML = `${t}`;
+  });
+  BR.forEach(b => ['o', 'i', 'r', 'c'].forEach((k, i) => $(`#t${k}_${b}`).textContent = T[b][i]));
+}
+
+function commit(el) {
+  const { t, id, x } = el.dataset, v = el.value === '' ? undefined : Math.max(0, t == 'q' ? +el.value : Math.floor(+el.value));
+  if (t == 'q') {
+    S.orders[D] = S.orders[D] || {};
+    S.orders[D][id] = S.orders[D][id] || {};
+    if (v === undefined) delete S.orders[D][id][x];
+    else S.orders[D][id][x] = v;
+    el.classList.toggle('e', v === undefined);
+  } else {
+    setReg(id, x, t == 'i' ? 'iss' : 'ret', v || 0);
+  }
+  save();
+  refresh();
+}
+
+function setReg(r, b, f, v) {
+  let g = S.tx.find(t => t.r == r && t.b == b && t.date == D && !t.void);
+  if (!g) {
+    if (!v) return;
+    g = { id: S.seq++, date: D, r, b, iss: 0, ret: 0, cap: brandCap(b), src: 'register', void: 0 };
+    S.tx.push(g);
+  }
+  g[f] = v;
+}
+
+document.addEventListener('keydown', e => {
+  const el = e.target;
+  if (!el.matches || !el.matches('#reg input')) return;
+  const m = { Enter: [1, 0], ArrowDown: [1, 0], ArrowUp: [-1, 0], ArrowRight: [0, 1], ArrowLeft: [0, -1] }[e.key];
+  if (!m) return;
+  e.preventDefault();
+  commit(el);
+  const n = document.querySelector(`#reg input[data-r="${+el.dataset.r + m[0]}"][data-c="${+el.dataset.c + m[1]}"]`);
+  if (n) { n.focus(); n.select(); }
+});
+document.addEventListener('change', e => { if (e.target.matches && e.target.matches('#reg input')) commit(e.target); });
+
+function exportRegXLSX() {
+  const rows = [];
+  const h1 = ['Customer', ...S.prod.map(p => p.name), ...BR.flatMap(b => [b + ' Open', b + ' Issued', b + ' Returned', b + ' Closing'])];
+  rows.push(h1);
+  S.ret.forEach(r => {
+    const row = [r.name];
+    S.prod.forEach(p => row.push(ord(r.id, p.id) ?? ''));
+    BR.forEach(b => {
+      const x = day(r.id, b, D);
+      row.push(x.o, x.iss, x.rt, x.c);
+    });
+    rows.push(row);
+  });
+  downloadExcelAOA(rows, `Register_${D}.xlsx`, `Register_${D}`);
+}
+
+// ==========================================
+// 3. MONTHLY EXCEL SHEET (Auto-calculating Ledger)
+// ==========================================
+function buildCustomerSheetData(rid, monthStr) {
+  const [y, m] = monthStr.split('-').map(Number);
+  const n = new Date(y, m, 0).getDate();
+  const ds = [];
+  for (let i = 1; i <= n; i++) {
+    const d = monthStr + '-' + String(i).padStart(2, '0');
+    if (d <= TODAY || monthStr < TODAY.slice(0, 7)) ds.push(d);
+  }
+
+  const r = RT(rid);
+  const P = S.prod;
+  const nb = P.length + 1;
+  const header = ['Date', ...P.map(p => p.name), 'Todays Payment', 'Pre. Balance', 'Total Amount', 'Cash Jama', 'Online Jama', 'Total Jama', 'Balance Pending', 'Remarks'];
+
+  const rows = [];
+  let prevBal = coR(r.id, addD(monthStr + '-01', -1));
+
+  ds.forEach(d => {
+    const o = (S.orders[d] || {})[r.id] || {};
+    let todaysPay = 0;
+    const quantities = P.map(p => {
+      const q = o[p.id];
+      if (q != null && q > 0) {
+        todaysPay += (q * rate(p, d));
+        return q;
+      }
+      return '';
+    });
+
+    const totalAmt = prevBal + todaysPay;
+    const dayPayments = S.pay.filter(x => x.r == r.id && !x.void && x.date == d);
+    const cash = dayPayments.filter(x => x.m == 'Cash').reduce((a, b) => a + b.amt, 0);
+    const online = dayPayments.filter(x => x.m != 'Cash').reduce((a, b) => a + b.amt, 0);
+    const totalJama = cash + online;
+    const balancePending = totalAmt - totalJama;
+
+    let note = '';
+    if (todaysPay === 0 && totalJama === 0 && d <= TODAY) note = 'Sutti';
+
+    rows.push([
+      d,
+      ...quantities,
+      Math.round(todaysPay * 100) / 100,
+      Math.round(prevBal * 100) / 100,
+      Math.round(totalAmt * 100) / 100,
+      cash || '',
+      online || '',
+      totalJama || '',
+      Math.round(balancePending * 100) / 100,
+      note
+    ]);
+
+    prevBal = balancePending;
+  });
+
+  return { header, rows, P, nb };
+}
+
+function pMon() {
+  const sheet = buildCustomerSheetData(MR2, MM);
+  const r = RT(MR2);
+  const cs = i => sheet.rows.reduce((a, x) => a + (+x[i] || 0), 0);
+  const totRow = [
+    'Total',
+    ...sheet.P.map((p, idx) => cs(idx + 1)),
+    cs(sheet.nb),
+    '–',
+    '–',
+    cs(sheet.nb + 3),
+    cs(sheet.nb + 4),
+    cs(sheet.nb + 5),
+    sheet.rows.length ? sheet.rows[sheet.rows.length - 1][sheet.nb + 6] : 0,
+    ''
+  ];
+
+  const fRows = sheet.rows.map(x => x.map((v, i) => i >= sheet.nb && i <= sheet.nb + 6 && typeof v === 'number' ? inr(v) : (v === '' ? '–' : v)));
+  const fTot = totRow.map((v, i) => i >= sheet.nb && i <= sheet.nb + 6 && typeof v === 'number' ? `<b>${inr(v)}</b>` : (typeof v === 'number' ? `<b>${v}</b>` : v));
+
+  return `
+    <h1>${S.cfg.mr ? 'मासिक Excel हिशोब' : 'Monthly Customer Excel Ledger'}</h1>
+    <p class="sub">Auto-adds today's row every day. No manual formula filling required.</p>
+    
+    <div class="bar">
+      <label>Customer<select onchange="MR2=this.value;go()">${S.ret.map(x => `<option value="${x.id}" ${x.id == MR2 ? 'selected' : ''}>${esc(x.name)}</option>`).join('')}</select></label>
+      <label>Month<input type="month" value="${MM}" onchange="MM=this.value||MM;go()"></label>
+      <button class="p" onclick="exportCustomerXLSX()">⬇ Download Excel (.xlsx)</button>
+      <button onclick="resetCustomerMonth()">🔄 Update Opening Balance</button>
+      <button onclick="window.print()">Print</button>
+    </div>
+
+    <div class="cards">
+      <div class="card"><b>${inr(cs(sheet.nb))}</b><span>Month Purchases</span></div>
+      <div class="card"><b>${inr(cs(sheet.nb + 5))}</b><span>Total Paid (Jama)</span></div>
+      <div class="card bad"><b>${inr(sheet.rows.length ? sheet.rows[sheet.rows.length - 1][sheet.nb + 6] : 0)}</b><span>Current Balance Pending</span></div>
+    </div>
+
+    <div class="tw">
+      <table>
+        <thead>
+          <tr>${sheet.header.map((h, i) => `<th class="${i == 0 ? 'l' : ''}">${h}</th>`).join('')}</tr>
+        </thead>
+        <tbody>
+          ${fRows.map(r => `<tr>${r.map((v, i) => `<td class="${i == 0 ? 'l' : ''}">${v}</td>`).join('')}</tr>`).join('')}
+          <tr style="background:var(--gl);font-weight:700">${fTot.map((v, i) => `<td class="${i == 0 ? 'l' : ''}">${v}</td>`).join('')}</tr>
+        </tbody>
+      </table>
+    </div>
+  `;
+}
+
+function downloadExcelAOA(aoaData, fileName, sheetName = 'Sheet1') {
+  if (typeof XLSX === 'undefined') return toast('Excel engine loading...');
+  const wb = XLSX.utils.book_new();
+  const ws = XLSX.utils.aoa_to_sheet(aoaData);
+  XLSX.utils.book_append_sheet(wb, ws, sheetName.slice(0, 31));
+  XLSX.writeFile(wb, fileName);
+  toast('Excel downloaded: ' + fileName);
+}
+
+function exportCustomerXLSX() {
+  const sheet = buildCustomerSheetData(MR2, MM);
+  const r = RT(MR2);
+  const cs = i => sheet.rows.reduce((a, x) => a + (+x[i] || 0), 0);
+  const totRow = [
+    'Total',
+    ...sheet.P.map((p, idx) => cs(idx + 1)),
+    cs(sheet.nb),
+    '',
+    '',
+    cs(sheet.nb + 3),
+    cs(sheet.nb + 4),
+    cs(sheet.nb + 5),
+    sheet.rows.length ? sheet.rows[sheet.rows.length - 1][sheet.nb + 6] : 0,
+    ''
+  ];
+  const allData = [sheet.header, ...sheet.rows, totRow];
+  const cleanName = r.name.replace(/[^a-zA-Z0-9_\u0900-\u097F]/g, '_').slice(0, 20);
+  downloadExcelAOA(allData, `${cleanName}_${MM}.xlsx`, `${cleanName}`);
+}
+
+function resetCustomerMonth() {
+  const r = RT(MR2);
+  const currentDue = outst(r.id);
+  const newBal = prompt(`Enter new opening balance for ${r.name}:`, currentDue);
+  if (newBal === null) return;
+  r.prevOut = parseFloat(newBal) || 0;
+  save();
+  go();
+  toast('Opening balance updated!');
+}
+
+// ==========================================
+// 4. DAILY BILLS (Pune WhatsApp PNG Generator)
+// ==========================================
+function drawBill(c, rid, d) {
+  const r = RT(rid), o = (S.orders[d] || {})[rid] || {}, L = S.prod.filter(p => o[p.id] != null), N = Math.max(L.length, 12), rh = 26, W = 640, x0 = 30, cw = [210, 95, 90, 95, 90], H = 30 + 34 + 26 + 28 + rh * (N + 2) + 12 + rh * 6 + 30, g = c.getContext('2d'), F = '"Noto Sans Devanagari",Mangal,system-ui,sans-serif';
+  c.width = W * 2; c.height = H * 2; g.scale(2, 2);
+  const t = (s, x, y, b, a, sz) => { g.font = (b ? 'bold ' : '') + (sz || 15) + 'px ' + F; g.fillStyle = '#000'; g.textAlign = a || 'left'; g.textBaseline = 'middle'; g.fillText(s, x, y); };
+  const bx = (x, y, w, h, f) => { if (f) { g.fillStyle = f; g.fillRect(x, y, w, h); } g.strokeStyle = '#000'; g.lineWidth = 1; g.strokeRect(x + .5, y + .5, w, h); };
+  g.fillStyle = '#ffe600'; g.fillRect(0, 0, W, H);
+  g.fillStyle = '#fff'; g.fillRect(14, 14, W - 28, H - 28);
+  const tw = 580; let y = 30;
+  bx(x0, y, tw, 34); t(S.cfg.biz, W / 2, y + 17, 1, 'center', 20); y += 34;
+  bx(x0, y, tw, 26, '#ff7ab8'); t(r.name, W / 2, y + 13, 1, 'center', 16); y += 26;
+  const dd = new Date(d + 'T00:00:00'); bx(x0, y, tw / 2, 28); bx(x0 + tw / 2, y, tw / 2, 28);
+  t(dd.toLocaleDateString('mr-IN', { day: 'numeric', month: 'long', year: 'numeric' }), x0 + tw / 4, y + 14, 0, 'center');
+  t(dd.toLocaleDateString('mr-IN', { weekday: 'long' }), x0 + 3 * tw / 4, y + 14, 0, 'center'); y += 28;
+  const cx = [0, ...cw.map((w, i) => cw.slice(0, i + 1).reduce((a, b) => a + b, 0))];
+  ['दुधाचे नाव', 'दुधाचे प्रमाण', 'रिटर्न दूध', 'एकूण दूध', 'रक्कम'].forEach((s, i) => { bx(x0 + cx[i], y, cw[i], rh); t(s, x0 + cx[i] + cw[i] / 2, y + rh / 2, 1, 'center', 14); }); y += rh;
+  let tot = 0;
+  for (let i = 0; i < N; i++) {
+    const p = L[i], q = p ? o[p.id] : 0, a = p ? q * rate(p, d) : 0;
+    tot += a;
+    [p ? (p.mr || p.name) : '', p ? String(q) : '', '', p ? String(q) : '', p ? String(Math.round(a)) : ''].forEach((s, k) => {
+      bx(x0 + cx[k], y, cw[k], rh);
+      t(s, k ? x0 + cx[k] + cw[k] - 8 : x0 + 6, y + rh / 2, 0, k ? 'right' : 'left', 14);
+    });
+    y += rh;
+  }
+  bx(x0, y, cx[4], rh, '#7ccf5a'); t("Today's Amount", x0 + cx[4] - 8, y + rh / 2, 1, 'right');
+  bx(x0 + cx[4], y, cw[4], rh, '#7ccf5a'); t(String(Math.round(tot)), x0 + tw - 8, y + rh / 2, 1, 'right');
+  y += rh + 12;
+
+  const X = BR.map(b => day(rid, b, d)), sm = k => X.reduce((a, z) => a + z[k], 0), pc = sm('o'), ic = sm('iss'), rc = sm('rt'), pp = S.pay.filter(z => z.r == rid && !z.void && z.date == d), ca = pp.filter(z => z.m == 'Cash').reduce((a, z) => a + z.amt, 0), on = pp.reduce((a, z) => a + z.amt, 0) - ca, pr = coR(rid, addD(d, -1));
+  const A = [['मागील बाकी क्रेट', pc], ['आजचे क्रेट', ic], ['एकूण क्रेट', pc + ic], ['जमा क्रेट', rc], ['एकूण बाकी क्रेट', pc + ic - rc], ['', '']], B = [['मागील बाकी रक्कम', pr], ['आजची रक्कम', tot], ['एकूण रक्कम', pr + tot], ['जमा रोख रक्कम', ca], ['जमा ऑनलाईन रक्कम', on], ['एकूण बाकी रक्कम', pr + tot - ca - on]];
+  for (let i = 0; i < 6; i++) {
+    bx(x0, y, 200, rh); bx(x0 + 200, y, 85, rh); bx(x0 + 300, y, 190, rh); bx(x0 + 490, y, 90, rh);
+    t(A[i][0], x0 + 6, y + rh / 2);
+    t(String(A[i][1]), x0 + 280, y + rh / 2, 0, 'right');
+    t(B[i][0], x0 + 306, y + rh / 2);
+    t(String(Math.round(B[i][1])), x0 + 574, y + rh / 2, 0, 'right');
+    y += rh;
+  }
+}
+
+async function dlBill(r, d) {
+  const c = document.createElement('canvas');
+  drawBill(c, r, d);
+  try {
+    c.toBlob(blob => {
+      const a = document.createElement('a');
+      a.download = 'Bill_' + RT(r).name.replace(/[^a-zA-Z0-9_\u0900-\u097F]/g, '_') + '_' + d + '.png';
+      a.href = URL.createObjectURL(blob);
+      a.click();
+      toast('Bill image downloaded · Send on WhatsApp!');
+    }, 'image/png');
+  } catch(e) {
+    window.print();
+  }
+}
+
+function pBill() {
+  setTimeout(() => drawBill($('#bc'), BL, BD), 0);
+  return `
+    <h1>Daily Bills (दैनिक बिल)</h1>
+    <p class="sub">Yellow-and-pink Pune dairy bill. Click to download as PNG image and send to customer on WhatsApp.</p>
+    <div class="bar">
+      <label>Date<input type="date" value="${BD}" onchange="BD=this.value;go()"></label>
+      <label>Customer<select onchange="BL=this.value;go()">${S.ret.map(x => `<option value="${x.id}" ${x.id == BL ? 'selected' : ''}>${esc(x.name)}</option>`).join('')}</select></label>
+      <button class="p" onclick="dlBill(BL,BD)">⬇ Download Bill for WhatsApp (PNG)</button>
+      <button onclick="window.print()">Print</button>
+    </div>
+    <canvas id="bc" style="width:100%;max-width:580px;border:1px solid var(--bd);border-radius:10px;box-shadow:0 4px 6px -1px rgba(0,0,0,0.05)"></canvas>
+  `;
+}
+
+// ==========================================
+// 5. PAYMENTS & JAMA
+// ==========================================
+function pPay() {
+  return `
+    <h1>Payments & Collections (जमा व वसुली)</h1>
+    <div class="box">
+      <b style="font-size:15px">Record New Collection (पेमेंट नोंदवा)</b>
+      <div class="bar" style="margin-top:10px">
+        <label>Date<input type="date" id="yd" value="${TODAY}"></label>
+        <label>Customer<select id="yr">${S.ret.map(r => `<option value="${r.id}">${esc(r.name)} (Due: ${inr(outst(r.id))})</option>`).join('')}</select></label>
+        <label>Amount ₹<input id="ya" type="number" style="width:120px" placeholder="Amount"></label>
+        <label>Method<select id="ym"><option>Cash</option><option>Online</option><option>Cheque</option></select></label>
+        <label>Ref / Note<input id="yf" placeholder="Optional ref" style="width:140px"></label>
+        <button class="p" onclick="recPay()">Save Payment</button>
+      </div>
+    </div>
+    <div class="tw">
+      <table>
+        <thead>
+          <tr>
+            <th class="l">Receipt</th>
+            <th>Date</th>
+            <th class="l">Customer</th>
+            <th>Amount ₹</th>
+            <th>Method</th>
+            <th>Ref</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          ${S.pay.map(x => `
+            <tr class="${x.void ? 'void' : ''}">
+              <td class="l"><b>RC-${x.id}</b></td>
+              <td>${fd(x.date)}</td>
+              <td class="l">${esc(RT(x.r).name)}</td>
+              <td><b>${inr(x.amt)}</b></td>
+              <td><span class="pill ${x.m == 'Cash' ? '' : 'a'}">${x.m}</span></td>
+              <td>${esc(x.ref || '–')}</td>
+              <td>${x.void ? '<span class="pill r">Voided</span>' : `<button class="s" onclick="voidPay(${x.id})">Void</button>`}</td>
+            </tr>
+          `).reverse().join('')}
+        </tbody>
+      </table>
+    </div>
+  `;
+}
+
+function recPay() {
+  const a = Math.floor(+$('#ya').value);
+  if (!(a > 0)) return toast('Enter valid amount');
+  S.pay.push({ id: S.seq++, date: $('#yd').value, r: $('#yr').value, amt: a, m: $('#ym').value, ref: $('#yf').value, al: 'Account', void: 0 });
+  save();
+  go();
+  toast('Payment saved & customer sheet updated');
+}
+
+function voidPay(id) {
+  if (!confirm('Void this payment entry?')) return;
+  const x = S.pay.find(p => p.id == id);
+  x.void = 1;
+  save();
+  go();
+  toast('Payment voided');
+}
+
+// ==========================================
+// 6. CRATE MANAGEMENT
+// ==========================================
+function pCrate() {
+  return `
+    <h1>Crate Management (क्रेट हिशोब)</h1>
+    <p class="sub">Track crates held by retailers across brands. High balance alerts trigger automatically at ≥ 25 crates.</p>
+    <div class="tw">
+      <table>
+        <thead>
+          <tr>
+            <th class="l">Customer</th>
+            ${BR.map(b => `<th>${b}</th>`).join('')}
+            <th>Total Crates Out</th>
+            <th>Alert</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${S.ret.map(r => {
+            const v = BR.map(b => bal(r.id, b, TODAY, 1));
+            const tot = sum(v.map(x => ({ x })), 'x');
+            return `
+              <tr>
+                <td class="l"><b>${esc(r.name)}</b> <small style="color:var(--mu)">${r.route}</small></td>
+                ${v.map(x => `<td class="${x < 0 ? 'neg' : ''}"><b>${x}</b></td>`).join('')}
+                <td><b style="font-size:14px">${tot}</b></td>
+                <td>${tot >= S.cfg.hi ? '<span class="pill r">⚠️ High (≥25)</span>' : '<span class="pill">OK</span>'}</td>
+              </tr>
+            `;
+          }).join('')}
+        </tbody>
+      </table>
+    </div>
+  `;
+}
+
+// ==========================================
+// 7. RETAILERS & RATES
+// ==========================================
+function pRet() {
+  return `
+    <h1>Retailers & Product Rates (विक्रेते व दर)</h1>
+    <div class="box">
+      <b style="font-size:15px">Milk Selling Rates (दर बदल करा)</b>
+      <div class="tw" style="margin-top:10px">
+        <table>
+          <thead><tr><th class="l">Brand</th><th class="l">Product</th><th>Selling Rate ₹</th><th>Crate Size</th></tr></thead>
+          <tbody>
+            ${S.prod.map(p => `
+              <tr>
+                <td class="l"><b>${p.brand}</b></td>
+                <td class="l">${p.name} (${p.mr || ''})</td>
+                <td><input type="number" step="any" value="${p.rate}" style="width:90px" onchange="setRate('${p.id}',this.value)"></td>
+                <td>${p.cap} pcs/cr</td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="box">
+      <b style="font-size:15px">Retailer Customer List (${S.ret.length} Customers)</b>
+      <div class="tw" style="margin-top:10px">
+        <table>
+          <thead><tr><th class="l">Customer Name</th><th>Route</th><th>Mobile</th><th>Current Outstanding</th><th>Action</th></tr></thead>
+          <tbody>
+            ${S.ret.map(r => `
+              <tr>
+                <td class="l"><b>${esc(r.name)}</b></td>
+                <td>${r.route}</td>
+                <td>${r.mob || '–'}</td>
+                <td class="${outst(r.id) > 0 ? 'neg' : ''}"><b>${inr(outst(r.id))}</b></td>
+                <td><button class="s" onclick="MR2='${r.id}';nav('mon')">Open Excel Sheet</button></td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  `;
+}
+
+function setRate(id, v) {
+  const p = S.prod.find(x => x.id == id);
+  p.rate = Math.max(0, +v || 0);
+  save();
+  toast('Rate updated');
+}
+
+// ==========================================
+// 8. SETTINGS & 1-CLICK BACKUP
+// ==========================================
+function pSet() {
+  return `
+    <h1>Settings & Safety Backups</h1>
+    <div class="box">
+      <b style="font-size:15px">Business Profile</b>
+      <div class="bar" style="margin-top:10px">
+        <label>Business Name<input value="${esc(S.cfg.biz)}" onchange="S.cfg.biz=this.value;save()" style="width:280px"></label>
+        <label>Invoice Prefix<input value="${esc(S.cfg.pre)}" style="width:80px" onchange="S.cfg.pre=this.value;save()"></label>
+        <label>Language<select onchange="S.cfg.mr=+this.value;save();go()"><option value="0" ${S.cfg.mr ? '' : 'selected'}>English</option><option value="1" ${S.cfg.mr ? 'selected' : ''}>मराठी (Marathi)</option></select></label>
+      </div>
+    </div>
+    <div class="box">
+      <b style="font-size:15px">🛡️ Zero-Mistake Safety & Backup</b>
+      <p class="sub" style="margin-top:4px">Connected to local <b>PostgreSQL 18</b> (port 5432). Download a full backup anytime to keep your data safe forever.</p>
+      <div class="bar">
+        <button class="p" onclick="exportFullJSONBackup()">💾 Download Full Company Backup (.json)</button>
+        <button onclick="document.getElementById('restoreFileInput').click()">📥 Restore Backup</button>
+        <input type="file" id="restoreFileInput" style="display:none" accept=".json" onchange="restoreFullJSONBackup(this)">
+      </div>
+    </div>
+  `;
+}
+
+function exportFullJSONBackup() {
+  const jsonStr = JSON.stringify(S, null, 2);
+  const blob = new Blob([jsonStr], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `Nikhil_Milk_Backup_${TODAY}.json`;
+  a.click();
+  toast('Company backup saved to your laptop!');
+}
+
+function restoreFullJSONBackup(input) {
+  const file = input.files && input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      S = JSON.parse(e.target.result);
+      fix();
+      save();
+      go();
+      toast('Backup restored successfully!');
+    } catch(err) {
+      alert('Error: ' + err.message);
+    }
+  };
+  reader.readAsText(file);
+}
+
+// Marathi Translator
+const DIC = ['Dashboard','डॅशबोर्ड','Daily Register','दैनिक नोंदवही','Monthly Excel Sheet','मासिक Excel शीट','Daily Bills','दैनिक बिल','Payments & Jama','पेमेंट व जमा','Crate Management','क्रेट हिशोब','Retailers & Rates','विक्रेते व दर','Settings & Backup','सेटिंग्ज व बॅकअप','Customer','ग्राहक','Total Amount','एकूण रक्कम','Cash Jama','रोख जमा','Online Jama','ऑनलाईन जमा','Total Jama','एकूण जमा','Balance Pending','बाकी रक्कम'];
+let DK = [];
+for (let i = 0; i < DIC.length; i += 2) DK.push([new RegExp('(?<![A-Za-z])' + DIC[i].replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '(?![A-Za-z])', 'g'), DIC[i + 1], DIC[i].length]);
+DK.sort((a, b) => b[2] - a[2]);
+const trs = s => S.cfg.mr ? DK.reduce((a, k) => a.replace(k[0], () => k[1]), s) : s;
+function tr(root) {
+  if (!S.cfg.mr || !root) return;
+  const w = document.createTreeWalker(root, NodeFilter.SHOW_TEXT), L = [];
+  let n; while (n = w.nextNode()) L.push(n);
+  L.forEach(n => { if (/[A-Za-z]/.test(n.nodeValue)) n.nodeValue = trs(n.nodeValue); });
+}
+
+go();
+</script></body></html>

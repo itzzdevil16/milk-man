@@ -1,0 +1,3018 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>Milk Distribution ERP – Crate & Excel Ledger Management</title>
+<!-- SheetJS for real .xlsx Excel generation & reading -->
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<!-- Google Fonts for Professional & Aesthetic Dairy Typography -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+/* ==========================================================================
+   THEME STYLING: TRADITIONAL INDIAN MILK DAIRY
+   LIGHT: Milk Cream & Warm Dairy Brown (श्वेत-दुध व लोणी तपकिरी)
+   DARK: Night Dairy Obsidian & Churned Butter Gold (रात्र मोड - समृद्ध गडद व सुवर्ण)
+   ========================================================================== */
+
+:root {
+  /* LIGHT THEME (Default): Pure Milk White & Warm Dairy Brown */
+  --bg: #f8f5ee;              /* Warm ivory buttermilk background */
+  --sf: #ffffff;              /* Crisp pure milk white surface */
+  --sf-subtle: #fcfaf6;       /* Subtle cream surface */
+  --tx: #2a2017;              /* Deep roasted cocoa / earthen brown for crisp readability */
+  --mu: #7c6d5e;              /* Muted earthenware gray-brown */
+  --bd: #e4dcce;              /* Warm soft cream-tan border */
+  --g: #7a4419;               /* Traditional dairy brown (तांबूस तपकिरी / मातीचा रंग) */
+  --gl: #f4ecdf;              /* Buttermilk foam / malai wash */
+  --p: #7a4419;
+  --gold: #c68a35;            /* Pure golden ghee / brass milk can accent */
+  --gold-bg: #fdf5e6;
+  --hat: #eee5d8;
+  --rd: #b42b1e;              /* Vermilion red */
+  --rl: #fceee9;
+  --am: #9c550c;              /* Warm turmeric amber */
+  --al: #fdf2df;
+  --shadow-sm: 0 1px 3px rgba(74, 45, 23, 0.06), 0 1px 2px rgba(74, 45, 23, 0.04);
+  --shadow-md: 0 4px 14px rgba(74, 45, 23, 0.08), 0 2px 4px rgba(74, 45, 23, 0.04);
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  box-sizing: border-box;
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  color-scheme: light;
+}
+
+[data-theme="dark"] {
+  /* DARK THEME: Night Dairy Obsidian & Churned Butter Gold */
+  --bg: #151210;              /* Deep espresso obsidian night */
+  --sf: #201a16;              /* Warm charcoal cocoa */
+  --sf-subtle: #27211c;
+  --tx: #f5ede4;              /* Soft warm milk cream white */
+  --mu: #a59789;              /* Muted milk mist */
+  --bd: #392f26;              /* Burnished bronze border */
+  --g: #e5a34c;               /* Radiant golden ghee / churned butter gold */
+  --gl: #332417;              /* Warm amber glow */
+  --p: #e5a34c;
+  --gold: #f2ba63;
+  --gold-bg: #2d2013;
+  --hat: #2a221b;
+  --rd: #f87171;
+  --rl: #3c1917;
+  --am: #fbbf24;
+  --al: #3b2a12;
+  --shadow-sm: 0 1px 4px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.55);
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; min-height: 100vh; }
+body {
+  background: var(--bg);
+  color: var(--tx);
+  font: 14px/1.45 "Plus Jakarta Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  letter-spacing: -0.01em;
+  transition: background-color .2s ease, color .2s ease;
+}
+
+.app { display: flex; min-height: 100vh; }
+
+/* SIDEBAR & BRAND LOGO */
+.side {
+  width: 236px;
+  background: var(--sf);
+  border-right: 1px solid var(--bd);
+  padding: 14px 10px;
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 1px 0 4px rgba(0,0,0,0.02);
+  transition: background-color .2s ease, border-color .2s ease;
+}
+
+.logo-box {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px 14px;
+  border-bottom: 1px solid var(--bd);
+  margin-bottom: 10px;
+}
+.logo-badge {
+  font-size: 24px;
+  line-height: 1;
+  background: var(--gl);
+  border: 1px solid var(--bd);
+  border-radius: 10px;
+  padding: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow-sm);
+}
+.logo-text { min-width: 0; flex: 1; }
+.logo-title {
+  font-weight: 700;
+  font-size: 13.5px;
+  color: var(--g);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  letter-spacing: -0.2px;
+}
+.logo-sub {
+  font-size: 10px;
+  color: var(--mu);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-top: 1px;
+}
+
+.quick-tools {
+  display: flex;
+  gap: 6px;
+  padding: 0 4px 10px;
+  border-bottom: 1px solid var(--bd);
+  margin-bottom: 10px;
+}
+.quick-btn {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 6px 8px;
+  font-size: 11px;
+  font-weight: 600;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--bd);
+  background: var(--sf-subtle);
+  color: var(--tx);
+  cursor: pointer;
+  transition: all .15s ease;
+}
+.quick-btn:hover {
+  background: var(--gl);
+  color: var(--g);
+  border-color: var(--g);
+}
+
+.side a {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 10px;
+  border-radius: var(--radius-sm);
+  color: var(--tx);
+  cursor: pointer;
+  margin-bottom: 2px;
+  font-size: 13px;
+  font-weight: 500;
+  transition: all .15s ease;
+}
+.side a:hover {
+  background: var(--gl);
+  color: var(--g);
+}
+.side a.on {
+  background: var(--g);
+  color: #ffffff;
+  font-weight: 600;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+}
+[data-theme="dark"] .side a.on {
+  color: #151210;
+  font-weight: 700;
+}
+
+/* MAIN CONTENT */
+main { flex: 1; min-width: 0; padding: 20px 24px; }
+h1 {
+  font-size: 22px;
+  font-weight: 700;
+  margin: 0 0 4px;
+  color: var(--tx);
+  letter-spacing: -0.3px;
+}
+.sub {
+  color: var(--mu);
+  margin: 0 0 16px;
+  font-size: 13px;
+}
+
+.bar {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: end;
+  margin-bottom: 14px;
+}
+label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--mu);
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+input, select, button {
+  font: inherit;
+  color: var(--tx);
+  background: var(--sf);
+  border: 1px solid var(--bd);
+  border-radius: var(--radius-sm);
+  padding: 6px 10px;
+  transition: border-color .15s ease, box-shadow .15s ease, background-color .15s ease;
+}
+input:focus, select:focus {
+  outline: none;
+  border-color: var(--g);
+  box-shadow: 0 0 0 3px var(--gl);
+}
+button {
+  cursor: pointer;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+}
+button:hover {
+  background: var(--sf-subtle);
+}
+button.p {
+  background: var(--g);
+  border-color: var(--g);
+  color: #ffffff;
+  font-weight: 600;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+}
+button.p:hover {
+  filter: brightness(1.08);
+}
+[data-theme="dark"] button.p {
+  color: #151210;
+  font-weight: 700;
+}
+button.s {
+  padding: 3px 8px;
+  font-size: 12px;
+}
+button.danger {
+  background: var(--rd);
+  border-color: var(--rd);
+  color: #fff;
+  font-weight: 600;
+}
+button.danger:hover {
+  filter: brightness(1.1);
+}
+
+input[type="date"] { cursor: pointer; }
+input[type="date"]::-webkit-calendar-picker-indicator { cursor: pointer; }
+
+/* TABS */
+.tabs {
+  display: flex;
+  gap: 6px;
+  border-bottom: 1px solid var(--bd);
+  margin-bottom: 16px;
+  overflow-x: auto;
+}
+.tabs button {
+  border: 0;
+  border-bottom: 3px solid transparent;
+  border-radius: 0;
+  background: none;
+  white-space: nowrap;
+  padding: 8px 12px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--mu);
+}
+.tabs button:hover {
+  color: var(--g);
+}
+.tabs button.on {
+  border-color: var(--g);
+  color: var(--g);
+  font-weight: 700;
+}
+
+/* CARDS & STAT METRICS */
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 12px;
+  margin-bottom: 16px;
+}
+.card {
+  background: var(--sf);
+  border: 1px solid var(--bd);
+  border-radius: var(--radius-md);
+  padding: 12px 14px;
+  box-shadow: var(--shadow-sm);
+  transition: transform .15s ease, box-shadow .15s ease;
+}
+.card:hover {
+  box-shadow: var(--shadow-md);
+}
+.card b {
+  font-size: 22px;
+  display: block;
+  color: var(--g);
+  letter-spacing: -0.3px;
+  margin-bottom: 2px;
+}
+.card span {
+  color: var(--mu);
+  font-size: 12px;
+  font-weight: 500;
+}
+.card.bad b {
+  color: var(--rd);
+}
+
+/* TABLES */
+.tw {
+  overflow: auto;
+  border: 1px solid var(--bd);
+  border-radius: var(--radius-md);
+  background: var(--sf);
+  max-height: 72vh;
+  box-shadow: var(--shadow-sm);
+}
+table {
+  border-collapse: separate;
+  border-spacing: 0;
+  width: 100%;
+}
+th, td {
+  padding: 6px 10px;
+  border-bottom: 1px solid var(--bd);
+  border-right: 1px solid var(--bd);
+  text-align: right;
+  white-space: nowrap;
+  font-size: 13px;
+}
+th {
+  background: var(--gl);
+  color: var(--tx);
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+}
+th.l, td.l { text-align: left; }
+tr:hover td {
+  background: rgba(122, 68, 25, 0.03);
+}
+[data-theme="dark"] tr:hover td {
+  background: rgba(229, 163, 76, 0.05);
+}
+
+.reg .st {
+  position: sticky;
+  left: 0;
+  background: var(--sf);
+  z-index: 1;
+  text-align: left;
+  min-width: 160px;
+}
+.reg th.st {
+  background: var(--gl);
+  z-index: 3;
+}
+.reg small {
+  display: block;
+  color: var(--mu);
+  font-size: 11px;
+}
+.reg input {
+  width: 62px;
+  text-align: right;
+  padding: 3px 5px;
+  border-radius: 4px;
+}
+.reg input.e {
+  background: repeating-linear-gradient(45deg, var(--hat), var(--hat) 4px, var(--sf) 4px, var(--sf) 8px);
+}
+.g { border-left: 3px solid var(--g); }
+tfoot td {
+  position: sticky;
+  bottom: 0;
+  background: var(--gl);
+  font-weight: 700;
+}
+.neg { color: var(--rd); font-weight: 700; }
+
+/* PILLS & BADGES */
+.pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 9px;
+  border-radius: 99px;
+  font-size: 11px;
+  font-weight: 600;
+  background: var(--gl);
+  color: var(--g);
+  margin: 1px;
+  border: 1px solid transparent;
+}
+.pill.r { background: var(--rl); color: var(--rd); border-color: rgba(180,43,30,0.15); }
+.pill.a { background: var(--al); color: var(--am); border-color: rgba(156,85,12,0.15); }
+.void { opacity: .45; text-decoration: line-through; }
+
+/* BOXES & MODALS */
+.box {
+  background: var(--sf);
+  border: 1px solid var(--bd);
+  border-radius: var(--radius-md);
+  padding: 14px 16px;
+  margin-bottom: 14px;
+  box-shadow: var(--shadow-sm);
+}
+.note { color: var(--mu); font-size: 12px; line-height: 1.45; }
+
+.bill {
+  max-width: 640px;
+  background: #ffffff;
+  color: #111111;
+  border: 1px solid #d5cbbe;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+}
+.bill table th {
+  background: #f4ecdf;
+  color: #2a2017;
+  position: static;
+}
+.bill td, .bill th {
+  border-color: #d5cbbe;
+  color: #111111;
+}
+
+dialog {
+  border: 1px solid var(--bd);
+  border-radius: var(--radius-lg);
+  background: var(--sf);
+  color: var(--tx);
+  max-width: 480px;
+  width: 92%;
+  box-shadow: 0 12px 36px rgba(0,0,0,0.25);
+  padding: 20px;
+}
+dialog::backdrop {
+  background: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(2px);
+}
+dialog label { margin-bottom: 8px; }
+dialog input { width: 100%; }
+
+#toast {
+  position: fixed;
+  bottom: 22px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--g);
+  color: #ffffff;
+  padding: 10px 18px;
+  border-radius: 99px;
+  display: none;
+  z-index: 99;
+  font-weight: 600;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.2);
+}
+[data-theme="dark"] #toast {
+  color: #151210;
+}
+
+/* RESPONSIVE & PRINT */
+@media(max-width:760px) {
+  .app { flex-direction: column; }
+  .side { width: 100%; display: flex; flex-direction: row; overflow-x: auto; padding: 6px; }
+  .logo-box, .quick-tools { display: none; }
+  .side a { white-space: nowrap; }
+  main { padding: 12px; }
+  .hide-mobile { display: none !important; }
+  dialog { width: 96vw !important; max-width: 96vw !important; padding: 14px !important; margin: auto !important; }
+}
+@media print {
+  .side, .bar, .tabs, button { display: none !important; }
+  .tw { max-height: none; }
+}
+
+/* LOGIN & AUTHENTICATION STYLES */
+.login-wrap {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: radial-gradient(circle at 50% 20%, var(--gl) 0%, var(--bg) 80%);
+}
+.login-card {
+  width: 100%;
+  max-width: 420px;
+  background: var(--sf);
+  border: 1px solid var(--bd);
+  border-radius: var(--radius-lg);
+  padding: 32px 28px;
+  box-shadow: var(--shadow-md), 0 16px 36px rgba(0,0,0,0.06);
+  text-align: center;
+  animation: loginFade .25s ease-out;
+}
+@keyframes loginFade {
+  from { opacity: 0; transform: translateY(12px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+.login-icon {
+  font-size: 38px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 72px;
+  height: 72px;
+  background: var(--gl);
+  border: 1px solid var(--bd);
+  border-radius: 20px;
+  margin-bottom: 14px;
+  box-shadow: var(--shadow-sm);
+}
+.login-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--tx);
+  margin: 0 0 4px;
+}
+.login-sub {
+  font-size: 13px;
+  color: var(--mu);
+  margin: 0 0 24px;
+}
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  text-align: left;
+}
+.login-form label {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--mu);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+.login-form input {
+  padding: 10px 12px;
+  font-size: 14px;
+  border-radius: var(--radius-sm);
+}
+.login-btn {
+  width: 100%;
+  padding: 11px;
+  font-size: 14px;
+  font-weight: 700;
+  margin-top: 8px;
+  border-radius: var(--radius-sm);
+}
+.login-error {
+  background: var(--rl);
+  color: var(--rd);
+  border: 1px solid rgba(180,43,30,0.25);
+  border-radius: var(--radius-sm);
+  padding: 8px 12px;
+  font-size: 13px;
+  display: none;
+  align-items: center;
+  gap: 6px;
+  text-align: left;
+}
+.login-footer-hint {
+  margin-top: 20px;
+  font-size: 12px;
+  color: var(--mu);
+  line-height: 1.5;
+}
+</style></head><body><div class="app"><nav class="side" id="nav"></nav><main id="main"></main></div><dialog id="dlg"></dialog><div id="toast"></div>
+<script>
+const TODAY = new Date().toISOString().slice(0,10), BR = ['Gokul','Chitale','Amul','Shivanand'], KEY = 'milkerp_crate_v2';
+const $ = s => document.querySelector(s), esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const addD = (d, n) => { const x = new Date(d + 'T00:00:00Z'); x.setUTCDate(x.getUTCDate() + n); return x.toISOString().slice(0, 10); };
+const fd = d => d.slice(8) + '/' + d.slice(5, 7), sum = (a, k) => a.reduce((x, t) => x + (+t[k] || 0), 0), inr = n => '₹' + Math.round(n).toLocaleString('en-IN');
+let S, page = 'dash', tab = 'bal', D = TODAY, fR = '', fB = '', RP = { m: 'ret', f: addD(TODAY, -7), t: TODAY }, BL = 'R101', pgStatus = 'checking';
+const PAGES = ['Dashboard','Daily Register','Milk Requirement','Retailers','Products & Pricing','Daily Bills','Payments & Collections','Crate Management','Reports','Monthly Record','Settings'];
+const KEYS = ['dash','reg','req','ret','prod','bill','pay','crate','rep','mon','set'];
+
+function seed() {
+  const prod = [
+    { id: 'gf', brand: 'Gokul', name: 'FC 500ml', mr: 'गोकुळ फुल क्रीम दूध', cap: 12, rate: 71.3 },
+    { id: 'gc', brand: 'Gokul', name: 'Cow 500ml', mr: 'गोकुळ काऊ दूध', cap: 10, rate: 53 },
+    { id: 'cf', brand: 'Chitale', name: 'FC 500ml', mr: 'चितळे फुल क्रीम दूध', cap: 12, rate: 71 },
+    { id: 'cc', brand: 'Chitale', name: 'Cow 500ml', mr: 'चितळे काऊ दूध', cap: 12, rate: 55 },
+    { id: 'ct', brand: 'Chitale', name: 'Tea Special', mr: 'चितळे चहा स्पेशल', cap: 12, rate: 65 },
+    { id: 'at', brand: 'Amul', name: 'Taaza 500ml', mr: 'अमूल ताजा दूध', cap: 12, rate: 55 },
+    { id: 'ag', brand: 'Amul', name: 'Gold 500ml', mr: 'अमूल गोल्ड दूध', cap: 12, rate: 65 },
+    { id: 'as', brand: 'Amul', name: 'SNT 500ml', mr: 'अमूल SNT', cap: 12, rate: 42 },
+    { id: 'st', brand: 'Shivanand', name: 'Tond 500ml', mr: 'श्रीनंद टोन्ड', cap: 10, rate: 36 },
+    { id: 'ss', brand: 'Shivanand', name: 'SPL 500ml', mr: 'श्रीनंद स्पेशल', cap: 10, rate: 37 },
+    { id: 'ns', brand: 'Nature', name: 'Standard 500ml', mr: 'नेचर स्टँडर्ड दूध', cap: 12, rate: 50 },
+    { id: 'nd2', brand: 'Nature', name: 'Dahi 200g', mr: 'नेचर २०० ग्रॅम दही', cap: 12, rate: 74 },
+    { id: 'nd5', brand: 'Nature', name: 'Dahi 500g', mr: 'नेचर ५०० ग्रॅम दही', cap: 12, rate: 74 },
+    { id: 'gvc', brand: 'Govind', name: 'Cow 500ml', mr: 'गोविंद काऊ दूध', cap: 12, rate: 49.5 },
+    { id: 'gvs', brand: 'Govind', name: 'Standard 500ml', mr: 'गोविंद स्टँडर्ड दूध', cap: 12, rate: 51 },
+    { id: 'gd2', brand: 'Govind', name: 'Dahi 200g', mr: 'गोविंद २०० ग्रॅम दही', cap: 12, rate: 66.85 },
+    { id: 'gd5', brand: 'Govind', name: 'Dahi 500g', mr: 'गोविंद ५०० ग्रॅम दही', cap: 12, rate: 64.9 },
+    { id: 'gd1', brand: 'Govind', name: 'Dahi 1kg', mr: 'गोविंद १ किलो दही', cap: 6, rate: 70 },
+    { id: 'gt', brand: 'Govind', name: 'Tak', mr: 'गोविंद ताक', cap: 12, rate: 31 },
+    { id: 'stk', brand: 'Shivanand', name: 'Tak', mr: 'श्रीनंद ताक', cap: 12, rate: 30 },
+    { id: 'thc', brand: 'Thorat', name: 'Cow 500ml', mr: 'थोरात काऊ दूध', cap: 10, rate: 52.7 },
+    { id: 'wfc', brand: 'Warna', name: 'FC 500ml', mr: 'वारणा फुल क्रीम', cap: 12, rate: 56 }
+  ];
+
+  const customers = [
+    { id: 'R101', name: 'प्रवीण कदम (Pravin Kadam)', route: 'Kothrud', mob: '9822011223', prevOut: 199587 },
+    { id: 'R102', name: 'ओवी गायकवाड (Ovi Gaikwad)', route: 'Hadapsar', mob: '9822044556', prevOut: 75520 },
+    { id: 'R103', name: 'प्रफुल (Praful Dairy)', route: 'Baner', mob: '9822077889', prevOut: 346188 },
+    { id: 'R104', name: 'आबा तिखे (Aaba Tikhe)', route: 'Wakad', mob: '9822099001', prevOut: 184300 },
+    { id: 'R105', name: 'विनोद बिरादार (Vinod Biradar)', route: 'Hadapsar', mob: '9822022334', prevOut: 259475 },
+    { id: 'R106', name: 'तुनतुने (Tuntune)', route: 'Kothrud', mob: '9822055667', prevOut: 85394 },
+    { id: 'R107', name: 'सुनील ठानगे (Sunil Thange)', route: 'Baner', mob: '9822088990', prevOut: 264961 },
+    { id: 'R108', name: 'ठाकूर मामा (Thakur Mama)', route: 'Wakad', mob: '9822011002', prevOut: 72630 },
+    { id: 'R109', name: 'आप्पा बराटे (Appa Barate)', route: 'Kothrud', mob: '9822033445', prevOut: 0 },
+    { id: 'R110', name: 'संतोष आव्हाळे (Santosh Awhale)', route: 'Hadapsar', mob: '9822066778', prevOut: 47750 },
+    { id: 'R111', name: 'तरटे (Tarte)', route: 'Baner', mob: '9822099112', prevOut: 0 },
+    { id: 'R112', name: 'आतिश दिवेकर (Aatish Divekar)', route: 'Wakad', mob: '9822022446', prevOut: 0 },
+    { id: 'R113', name: 'अरुण/दिलीप-झेन सर कंपनी', route: 'Kothrud', mob: '9822055779', prevOut: 150745 },
+    { id: 'R114', name: 'शिव शंकर टी हाऊस', route: 'Baner', mob: '9822088003', prevOut: 0 },
+    { id: 'R115', name: 'मोरया मिल्क एजन्सी', route: 'Hadapsar', mob: '9822011335', prevOut: 0 },
+    { id: 'R116', name: 'चंद्रकांत थोरात', route: 'Wakad', mob: '9822044668', prevOut: 0 }
+  ];
+
+  const ret = customers.map(c => ({
+    ...c,
+    open: { Gokul: 10, Chitale: 8, Amul: 4, Shivanand: 2 }
+  }));
+
+  const o = {};
+  o[TODAY] = {
+    R101: { gf: 477, gc: 30, cf: 105, cc: 171.5, ss: 31, ns: 20, nd2: 12, gd5: 6, gt: 10, ag: 30 },
+    R102: { gf: 380, gc: 50 },
+    R103: { cf: 204, cc: 300 },
+    R104: { cf: 144, cc: 168 },
+    R105: { cf: 168, cc: 312 },
+    R106: { cf: 132 },
+    R107: { cf: 204, cc: 168 },
+    R108: { cf: 180, cc: 240 },
+    R111: { cf: 24, cc: 36 },
+    R112: { cf: 20, cc: 18 }
+  };
+
+  const tx = [];
+  let id = 1;
+  ret.forEach(r => {
+    tx.push({ id: id++, date: TODAY, r: r.id, b: 'Total', iss: 6, ret: 4, loose: 0, cap: 12, note: 'Daily register delivery', src: 'register', void: 0 });
+  });
+
+  const pay = [
+    { id: id++, date: TODAY, r: 'R101', amt: 22000, m: 'Cash', ref: 'Cash received', al: 'Account', void: 0 },
+    { id: id++, date: TODAY, r: 'R102', amt: 27770, m: 'Online', ref: 'UPI-481920', al: 'Account', void: 0 },
+    { id: id++, date: TODAY, r: 'R103', amt: 50160, m: 'Cash', ref: 'Cash hand', al: 'Account', void: 0 }
+  ];
+
+  return {
+    prod,
+    ret,
+    tx,
+    orders: o,
+    pay,
+    audit: [],
+    seq: id + 50,
+    cfg: { hi: 25, days: 5, dep: 0, mr: 0, cut: '16:00', biz: 'निखिल दुध डेअरी (Nikhil Milk Dairy Pune)', pre: 'INV', pm: 'Cash,UPI,Bank Transfer,Cheque,Other', auto15: 1, lastAuto15: '', lastAutoType: '', autoHistory: [], auth: { enabled: 1, user: 'admin', pass: '1234' } }
+  };
+}
+
+function load() {
+  try {
+    const v = localStorage.getItem(KEY);
+    return v ? JSON.parse(v) : null;
+  } catch (e) { return null; }
+}
+
+function save() {
+  try {
+    localStorage.setItem(KEY, JSON.stringify(S));
+    syncToPostgres();
+  } catch (e) {}
+}
+
+async function syncToPostgres() {
+  try {
+    const res = await fetch('http://localhost:8000/api/sync', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ prod: S.prod, ret: S.ret, cfg: S.cfg })
+    });
+    if (res.ok) pgStatus = 'connected';
+  } catch (e) {
+    pgStatus = 'offline';
+  }
+}
+
+async function checkPG() {
+  try {
+    const res = await fetch('http://localhost:8000/api/health');
+    if (res.ok) {
+      pgStatus = 'connected';
+      const badge = $('#pgBadge');
+      if (badge) {
+        badge.innerHTML = '🟢 PostgreSQL Connected';
+        badge.className = 'pill';
+      }
+    }
+  } catch (e) {
+    pgStatus = 'offline';
+  }
+}
+setInterval(checkPG, 15000);
+
+S = load() || seed();
+fix();
+if (S && S.cfg && S.cfg.auth && !localStorage.getItem('milk_auth_initialized')) {
+  S.cfg.auth.enabled = 1;
+  localStorage.setItem('milk_auth_initialized', '1');
+  save();
+}
+checkPG();
+
+const log = (a, d, why) => { S.audit.unshift({ t: new Date().toLocaleString('en-IN'), a, d, why: why || '' }); };
+const toast = m => {
+  const t = $('#toast');
+  t.textContent = trs(m);
+  t.style.display = 'block';
+  clearTimeout(t.h);
+  t.h = setTimeout(() => t.style.display = 'none', 2500);
+};
+
+// ---- Business calculations ----
+const act = () => S.tx.filter(t => !t.void), RT = id => S.ret.find(r => r.id == id) || { name: id, route: '', open: {}, prevOut: 0 }, brandCap = b => { const p = S.prod.find(p => p.brand == b); return p ? p.cap : 12; };
+const bal = (r, b, d, inc) => { const rt = RT(r); return (rt.open && rt.open[b] || 0) + act().filter(t => t.r == r && t.b == b && (inc ? t.date <= d : t.date < d)).reduce((a, t) => a + t.iss - t.ret, 0); };
+const day = (r, b, d) => { const T = act().filter(t => t.r == r && t.b == b && t.date == d), iss = sum(T, 'iss'), rt = sum(T, 'ret'), o = bal(r, b, d); return { o, iss, rt, c: o + iss - rt }; };
+const balTot = (r, d, inc) => { const rt = RT(r); const openTot = rt.openTot != null ? rt.openTot : (rt.open ? Object.values(rt.open).reduce((a, b) => a + (+b || 0), 0) : 0); return openTot + act().filter(t => t.r == r && (inc ? t.date <= d : t.date < d)).reduce((a, t) => a + (+t.iss || 0) - (+t.ret || 0), 0); };
+function isBagRetailer(r, d = D) {
+  const rt = (typeof r === 'object' && r) ? r : RT(r);
+  if (!rt) return false;
+  if (rt.noCrates) return true;
+  const regTx = S.tx.find(t => t.r == rt.id && t.date == d && t.src == 'register' && !t.void);
+  if (regTx && regTx.issManual && regTx.iss === 0) return true;
+  return false;
+}
+const reqCrates = (r, d) => {
+  const rt = RT(r);
+  if (isBagRetailer(rt, d) || !S.orders[d] || !S.orders[d][r]) return 0;
+  return S.prod.reduce((a, p) => a + Math.ceil((((S.orders[d] || {})[r] || {})[p.id] || 0) / p.cap), 0);
+};
+function syncAutoCrates(d = D) {
+  if (!S.orders[d]) return;
+  S.ret.forEach(r => {
+    if (r.noCrates) return;
+    const q = reqCrates(r.id, d);
+    if (q > 0) {
+      const regTx = S.tx.find(t => t.r == r.id && t.date == d && t.src == 'register' && !t.void);
+      if (!regTx) {
+        S.tx.push({ id: S.seq++, date: d, r: r.id, b: 'Total', iss: q, ret: 0, loose: 0, cap: 12, note: 'Daily register delivery', src: 'register', void: 0, issManual: false });
+      } else if (!regTx.issManual && regTx.iss !== q) {
+        regTx.iss = q;
+      }
+    }
+  });
+}
+const dayTot = (r, d) => {
+  const T = act().filter(t => t.r == r && t.date == d);
+  const regTx = T.find(t => t.src == 'register');
+  const othIss = sum(T.filter(t => t.src != 'register'), 'iss');
+  const rt = sum(T, 'ret');
+  const o = balTot(r, d, 0);
+  const q = reqCrates(r, d);
+  let iss;
+  if (regTx && regTx.issManual) {
+    iss = regTx.iss + othIss;
+  } else if (regTx && regTx.iss > 0) {
+    iss = regTx.iss + othIss;
+  } else if (q > 0) {
+    iss = q + othIss;
+  } else {
+    iss = sum(T, 'iss');
+  }
+  return { o, iss, rt, c: o + iss - rt, q, regTx };
+};
+const crates = (q, cap) => cap ? `${Math.floor(q / cap)} ${S.cfg.mr ? 'क्रेट +' : 'cr +'} ${q % cap} ${S.cfg.mr ? 'सुटे' : 'loose'}` : (S.cfg.mr ? 'लागू नाही' : 'n/a');
+const formatReqCrates = (qCrate, qBag, cap) => {
+  if (!cap) return S.cfg.mr ? 'लागू नाही' : 'n/a';
+  const cr = Math.floor(qCrate / cap);
+  const loose = (qCrate % cap) + (qBag || 0);
+  const crWord = S.cfg.mr ? 'क्रेट +' : 'cr +';
+  const looseWord = S.cfg.mr ? 'सुटे' : 'loose';
+  return `${cr} ${crWord} ${loose} ${looseWord}`;
+};
+const ord = (r, p) => (S.orders[D] && S.orders[D][r] && S.orders[D][r][p]);
+const rate = (p, d) => (S.snap[d] || {})[p.id] || p.rate, line = (r, d) => S.prod.map(p => ({ p, q: ((S.orders[d] || {})[r] || {})[p.id] || 0, rt: rate(p, d) })).filter(x => x.q), billed = (r, d) => line(r, d).reduce((a, x) => a + x.q * x.rt, 0), paid = (r, d) => S.pay.filter(x => x.r == r && !x.void && (!d || x.date == d)).reduce((a, x) => a + x.amt, 0), allb = r => Object.keys(S.orders).reduce((a, d) => a + billed(r, d), 0), outst = r => (RT(r).prevOut || 0) + allb(r) - paid(r), fb = n => n < 0 ? '<span class="pill a">Advance ' + inr(-n) + '</span>' : inr(n), fin = () => S.fin[D] || 'Open', regPill = () => `<span class="pill ${fin() == 'Finalized' ? 'r' : ''}">Register: ${fin()}</span>`, pn = id => { const p = S.prod.find(x => x.id == id); return p ? p.brand + ' ' + p.name : id; }, held = r => balTot(r, TODAY, 1), inv = (r, d) => S.cfg.pre + '-' + d.replace(/-/g, '') + '-' + r;
+
+function rows() {
+  const m = {}, out = [];
+  [...S.tx].sort((a, b) => a.date < b.date ? -1 : a.date > b.date ? 1 : a.id - b.id).forEach(t => {
+    if (t.void) { out.push({ ...t }); return; }
+    const k = t.r, o = m[k] != null ? m[k] : (RT(t.r).openTot != null ? RT(t.r).openTot : (RT(t.r).open ? Object.values(RT(t.r).open).reduce((a, b) => a + (+b || 0), 0) : 0)), c = o + (+t.iss || 0) - (+t.ret || 0);
+    m[k] = c;
+    out.push({ ...t, o, c });
+  });
+  return out;
+}
+
+function alerts() {
+  const out = [];
+  S.ret.forEach(r => {
+    const c = balTot(r.id, D, 1), T = act().filter(t => t.r == r.id), lr = T.filter(t => t.ret > 0).map(t => t.date).sort().pop(), li = T.filter(t => t.iss > 0).map(t => t.date).sort()[0], since = lr || li, dd = since ? Math.round((new Date(D) - new Date(since)) / 864e5) : 0, f = [];
+    if (c >= S.cfg.hi) f.push('High balance');
+    if (c > 0 && since && dd >= S.cfg.days) f.push('No return for ' + dd + ' days');
+    if (c < 0) f.push('Negative balance');
+    if (f.length) out.push({ r, c, f });
+  });
+  return out;
+}
+
+// Master Date Controller - Changes Active Date Globally
+function setMasterDate(newD) {
+  if (!newD) return;
+  D = newD;
+  BD = newD;
+  MM = newD.slice(0, 7);
+  syncAutoCrates(D);
+  go();
+  check15DayAutoBackup();
+}
+
+
+// ============================================================================
+// LOGIN & ACCESS SECURITY (ID & PASSWORD MANAGEMENT)
+// ============================================================================
+let isLoggedIn = false;
+let loginErrorMsg = '';
+
+function isAuthRequired() {
+  return S && S.cfg && S.cfg.auth && S.cfg.auth.enabled;
+}
+
+function checkLoginSession() {
+  if (!isAuthRequired()) return true;
+  return isLoggedIn || sessionStorage.getItem('milk_logged_in') === '1';
+}
+
+function handleLoginSubmit(e) {
+  if (e && e.preventDefault) e.preventDefault();
+  const uInput = $('#loginUser');
+  const pInput = $('#loginPass');
+  const u = uInput ? uInput.value.trim() : '';
+  const p = pInput ? pInput.value : '';
+
+  const cfgUser = (S.cfg.auth.user || 'admin').trim();
+  const cfgPass = String(S.cfg.auth.pass || '1234');
+
+  if (u.toLowerCase() === cfgUser.toLowerCase() && p === cfgPass) {
+    isLoggedIn = true;
+    loginErrorMsg = '';
+    try { sessionStorage.setItem('milk_logged_in', '1'); } catch(err) {}
+    toast('✅ लॉगिन यशस्वी! / Login Successful!');
+    go();
+  } else {
+    loginErrorMsg = S.cfg.mr ? 'चुकीचा आयडी किंवा पासवर्ड! / Invalid ID or Password!' : 'Incorrect Username or Password. Please try again.';
+    renderLoginPage();
+    const errBox = $('#loginErrorBox');
+    if (errBox) errBox.style.display = 'flex';
+  }
+}
+
+function handleLogout() {
+  if (!confirm(S.cfg.mr ? 'तुम्हाला खरंच लॉगआउट करायचे आहे का?' : 'Are you sure you want to log out?')) return;
+  isLoggedIn = false;
+  try { sessionStorage.removeItem('milk_logged_in'); } catch(err) {}
+  toast('लॉगआउट झाले / Logged out');
+  go();
+}
+
+function renderLoginPage() {
+  const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+  const appContainer = $('.app');
+  if (appContainer) appContainer.style.display = 'none';
+
+  let loginContainer = $('#loginWrap');
+  if (!loginContainer) {
+    loginContainer = document.createElement('div');
+    loginContainer.id = 'loginWrap';
+    document.body.prepend(loginContainer);
+  }
+  loginContainer.style.display = 'flex';
+  loginContainer.className = 'login-wrap';
+
+  const defaultUser = esc(S.cfg.auth.user || 'admin');
+  loginContainer.innerHTML = `
+    <div class="login-card">
+      <div class="login-icon">🥛</div>
+      <h2 class="login-title">${esc(S.cfg.biz || 'Nikhil Milk Dairy')}</h2>
+      <div class="login-sub">${S.cfg.mr ? 'दूध डेअरी व्यवस्थापन - सुरक्षित लॉगिन' : 'Milk Dairy ERP - Secure Login'}</div>
+      
+      <div id="loginErrorBox" class="login-error" style="display:${loginErrorMsg ? 'flex' : 'none'}">
+        <span>⚠️</span> <span>${loginErrorMsg}</span>
+      </div>
+
+      <form class="login-form" onsubmit="handleLoginSubmit(event)" autocomplete="off">
+        <label>
+          ${S.cfg.mr ? 'युझर आयडी (User ID)' : 'User ID / Username'}
+          <input type="text" id="loginUser" required autofocus placeholder="उदा. admin" value="${defaultUser}">
+        </label>
+        <label>
+          ${S.cfg.mr ? 'पासवर्ड (Password)' : 'Password'}
+          <div style="position:relative;display:flex;align-items:center">
+            <input type="password" id="loginPass" required placeholder="••••••••" style="width:100%;padding-right:38px">
+            <button type="button" onclick="togglePassVisibility('loginPass', this)" style="position:absolute;right:4px;background:none;border:none;cursor:pointer;padding:4px;font-size:16px;color:var(--mu)" title="Show/Hide Password">👁️</button>
+          </div>
+        </label>
+        <button type="submit" class="p login-btn">
+          🔒 ${S.cfg.mr ? 'लॉगिन करा (Log In)' : 'Sign In to ERP'}
+        </button>
+      </form>
+
+      <div class="login-footer-hint">
+        <div style="display:flex;justify-content:center;gap:12px;margin-top:16px">
+          <button class="quick-btn" onclick="toggleTheme()" style="padding:4px 10px;font-size:12px">
+            ${isDark ? '☀️ Light Mode' : '🌙 Dark Mode'}
+          </button>
+          <button class="quick-btn" onclick="S.cfg.mr=S.cfg.mr?0:1;save();renderLoginPage()" style="padding:4px 10px;font-size:12px">
+            🌐 ${S.cfg.mr ? 'English' : 'मराठी'}
+          </button>
+        </div>
+      </div>
+    </div>
+  `;
+  setTimeout(() => {
+    const pInput = $('#loginPass');
+    if (pInput) pInput.focus();
+  }, 100);
+}
+
+function togglePassVisibility(inputId, btn) {
+  const el = document.getElementById(inputId);
+  if (!el) return;
+  if (el.type === 'password') {
+    el.type = 'text';
+    btn.textContent = '🙈';
+  } else {
+    el.type = 'password';
+    btn.textContent = '👁️';
+  }
+}
+
+function saveAuthSettings() {
+  const isEn = $('#authEnabledToggle') ? ($('#authEnabledToggle').checked ? 1 : 0) : S.cfg.auth.enabled;
+  const u = $('#cfgAuthUser') ? $('#cfgAuthUser').value.trim() : S.cfg.auth.user;
+  const p = $('#cfgAuthPass') ? $('#cfgAuthPass').value : S.cfg.auth.pass;
+
+  if (isEn && !u) return toast('युझर आयडी रिकामी ठेवू शकत नाही / User ID cannot be empty');
+  if (isEn && !p) return toast('पासवर्ड रिकामी ठेवू शकत नाही / Password cannot be empty');
+
+  S.cfg.auth.enabled = isEn;
+  S.cfg.auth.user = u || 'admin';
+  S.cfg.auth.pass = p || '1234';
+
+  save();
+  if (isEn) {
+    isLoggedIn = true;
+    try { sessionStorage.setItem('milk_logged_in', '1'); } catch(e) {}
+  }
+  toast(isEn ? '🔒 लॉगिन पासवर्ड सेव्ह झाला! / Login Password Updated & Enabled!' : '🔓 लॉगिन सुरक्षा बंद केली / Password Security Disabled');
+  go();
+}
+
+// ---- Shell Navigation ----
+function go() {
+  if (isAuthRequired() && !checkLoginSession()) {
+    renderLoginPage();
+    return;
+  }
+  const loginWrap = $('#loginWrap');
+  if (loginWrap) loginWrap.style.display = 'none';
+  const appContainer = $('.app');
+  if (appContainer) appContainer.style.display = 'flex';
+  const dateBadge = `<div style="margin:6px 10px 10px;padding:8px 10px;background:var(--sf);border:1px solid var(--bd);border-radius:8px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+      <span style="font-size:11px;font-weight:700;color:var(--mu);text-transform:uppercase;letter-spacing:0.5px">📅 System Date</span>
+      ${D !== TODAY ? `<button onclick="setMasterDate(TODAY)" style="font-size:10px;padding:1px 5px;background:none;border:none;color:var(--g);cursor:pointer;font-weight:bold;text-decoration:underline">Today</button>` : ''}
+    </div>
+    <label style="cursor:pointer;display:block">
+      <input type="date" value="${D}" style="width:100%;font-size:13px;font-weight:bold;padding:4px 6px;cursor:pointer" onclick="try{this.showPicker()}catch(e){}" onchange="setMasterDate(this.value)">
+    </label>
+  </div>`;
+
+  const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+  const logoHtml = `<div class="logo-box">
+    <div class="logo-badge">🥛</div>
+    <div class="logo-text">
+      <div class="logo-title">${esc(S.cfg.biz)}</div>
+      <div class="logo-sub">${S.cfg.mr ? 'दूध डेअरी व्यवस्थापन' : 'Milk Dairy ERP'}</div>
+    </div>
+  </div>`;
+
+  const logoutBtn = isAuthRequired() ? `<button class="quick-btn" onclick="handleLogout()" title="Log out of ERP" style="color:var(--rd);border-color:rgba(180,43,30,0.3)">🚪 Logout</button>` : '';
+
+  const quickTools = `<div class="quick-tools" style="flex-wrap:wrap">
+    <button class="quick-btn" onclick="toggleTheme()" id="themeToggleBtn" title="Switch Light / Dark Theme">
+      ${isDark ? '☀️ Light' : '🌙 Dark'}
+    </button>
+    <button class="quick-btn" onclick="S.cfg.mr=S.cfg.mr?0:1;save();go()" title="Switch Language">
+      🌐 ${S.cfg.mr ? 'मराठी' : 'English'}
+    </button>
+    ${logoutBtn}
+  </div>`;
+
+  $('#nav').innerHTML = logoHtml + quickTools + '<div style="padding:0 4px 8px"><span id="pgBadge" class="pill ' + (pgStatus == 'connected' ? '' : 'a') + '">' + (pgStatus == 'connected' ? '🟢 PostgreSQL Live' : '💾 Local Storage') + '</span></div>' + dateBadge + PAGES.map((p, i) => {
+    return `<a class="${KEYS[i] == page ? 'on' : ''}" onclick="nav('${KEYS[i]}')">${i + 1}. ${S.cfg.mr ? MR[i] : p}</a>`;
+  }).join('');
+  const f = { dash: pDash, reg: pReg, req: pReq, ret: pRet, prod: pProd, bill: pBill, pay: pPay, crate: pCrate, rep: pRep, set: pSet, mon: pMon }[page] || pDash;
+  $('#main').innerHTML = f();
+  tr($('#nav'));
+  tr($('#main'));
+  if (page == 'reg') refresh();
+}
+const nav = p => { page = p; RS = ''; go(); };
+
+// ---- Dashboard ----
+function pDash() {
+  syncAutoCrates(D);
+  const pd = S.pay.filter(x => x.date == D && !x.void), cash = pd.filter(x => x.m == 'Cash').reduce((a, x) => a + x.amt, 0), on = pd.reduce((a, x) => a + x.amt, 0) - cash;
+  const billedSales = inr(S.ret.reduce((a, r) => a + billed(r.id, D), 0));
+  const tot = S.ret.reduce((a, r) => a + balTot(r.id, D, 1), 0), iss = sum(act().filter(t => t.date == D), 'iss'), rt = sum(act().filter(t => t.date == D), 'ret');
+  
+  let totPouches = 0, totBagPouches = 0, totCratePouches = 0;
+  const activeProducts = [];
+  const bagRetailerNames = new Set();
+
+  S.prod.forEach(p => {
+    let qCrate = 0, qBag = 0;
+    S.ret.forEach(r => {
+      const q = ((S.orders[D] || {})[r.id] || {})[p.id] || 0;
+      if (q > 0) {
+        if (isBagRetailer(r, D)) {
+          qBag += q;
+          bagRetailerNames.add(r.name);
+        } else {
+          qCrate += q;
+        }
+      }
+    });
+    const q = qCrate + qBag;
+    if (q > 0) {
+      totPouches += q;
+      totBagPouches += qBag;
+      totCratePouches += qCrate;
+      activeProducts.push({ p, q, qCrate, qBag });
+    }
+  });
+
+  const reqHtml = activeProducts.length ? activeProducts.map(x => `
+    <tr>
+      <td class="l"><b>${esc(x.p.brand)}</b></td>
+      <td class="l">${esc(x.p.name)}</td>
+      <td style="text-align:right;font-weight:600">${x.q}</td>
+      <td style="text-align:right"><span class="pill" style="font-size:12px;font-weight:600">${formatReqCrates(x.qCrate, x.qBag, x.p.cap)}</span></td>
+    </tr>
+  `).join('') : `<tr><td colspan="4" class="l note" style="padding:16px;text-align:center">No milk orders entered for ${fd(D)}. Use Daily Register to enter quantities.</td></tr>`;
+
+  return `<h1>Dashboard</h1>
+<div class="bar" style="margin-bottom:12px">
+  <label style="cursor:pointer" onclick="$('#dash_date')?.showPicker()"><b>Date</b> <input type="date" id="dash_date" value="${D}" style="cursor:pointer" onclick="try{this.showPicker()}catch(e){}" onchange="setMasterDate(this.value)"></label>
+  ${D !== TODAY ? `<button onclick="setMasterDate(TODAY)">Reset to Today</button>` : ''}
+</div>
+<div class="cards">
+  <div class="card"><b>${billedSales}</b><span>Billed sales</span></div>
+  <div class="card"><b>${inr(cash)}</b><span>Cash collected</span></div>
+  <div class="card"><b>${inr(on)}</b><span>Online collections</span></div>
+</div>
+<div class="cards">
+  <div class="card"><b>${iss}</b><span>Crates issued</span></div>
+  <div class="card"><b>${rt}</b><span>Empty crates returned</span></div>
+  <div class="card" style="cursor:pointer" onclick="showUnreturnedCrates()" title="Click to view from where crates are not returned"><b style="color:var(--g)">${tot}</b><span>Total crates not returned <small style="display:block;color:var(--mu);margin-top:2px">👆 Click to view list</small></span></div>
+</div>
+<div class="box">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+    <b>Milk requirement → crates</b>
+    <span class="note">${activeProducts.length ? `Total: <b>${totPouches}</b> pouches` : ''}</span>
+  </div>
+  <div class="tw">
+    <table>
+      <thead>
+        <tr>
+          <th class="l">Brand</th>
+          <th class="l">Product</th>
+          <th style="text-align:right">Pouches Ordered</th>
+          <th style="text-align:right">Crates Required</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${reqHtml}
+      </tbody>
+      ${activeProducts.length ? `
+      <tfoot>
+        <tr>
+          <td class="l" colspan="2"><b>Total Requirement</b></td>
+          <td style="text-align:right"><b>${totPouches} pouches</b></td>
+          <td style="text-align:right"></td>
+        </tr>
+      </tfoot>` : ''}
+    </table>
+  </div>
+  ${totBagPouches > 0 ? `
+  <div style="margin-top:10px;padding:8px 12px;background:#fef3c7;border:1px solid #f59e0b;border-radius:6px;font-size:12px;color:#92400e;display:flex;align-items:center;gap:6px">
+    <span>💡</span>
+    <span><b>${S.cfg.mr ? 'टीप:' : 'Note:'}</b> ${S.cfg.mr ? `<b>${Array.from(bagRetailerNames).map(esc).join(', ')}</b> यांच्यासाठी <b>${totBagPouches} पाकिटे सुटी (loose)</b> जातील (क्रेटची गरज नाही).` : `Retailer <b>${Array.from(bagRetailerNames).map(esc).join(', ')}</b> takes <b>${totBagPouches} loose pouches</b> (no plastic crates needed).`}</span>
+  </div>` : ''}
+</div>`;
+}
+
+function showUnreturnedCrates() {
+  const d = $('#dlg');
+  d.style.maxWidth = '620px';
+  d.style.width = '96%';
+
+  const renderTable = (q = '') => {
+    const list = S.ret.map(r => {
+      const sum = balTot(r.id, D, 1);
+      return { r, sum };
+    }).filter(x => x.sum > 0 && (x.r.name + (x.r.mob || '')).toLowerCase().includes(q.toLowerCase()))
+      .sort((a, b) => b.sum - a.sum);
+
+    const grand = list.reduce((a, x) => a + x.sum, 0);
+
+    $('#unretList').innerHTML = list.length ? `
+      <table>
+        <thead>
+          <tr>
+            <th class="l">Shop Name</th>
+            <th class="l">Mobile Number</th>
+            <th style="text-align:right">Crates Left</th>
+            <th style="text-align:center">WhatsApp Reminder</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${list.map(x => {
+            const msg = encodeURIComponent(`नमस्कार ${x.r.name}, आपल्याकडे निखिल दुध डेअरीचे एकूण ${x.sum} क्रेट बाकी आहेत. कृपया रिकामे क्रेट परत पाठवावेत. धन्यवाद!`);
+            const wa = x.r.mob ? `<a href="https://wa.me/91${x.r.mob.replace(/\D/g,'')}?text=${msg}" target="_blank" class="pill" style="text-decoration:none;background:#25D366;color:#fff;font-weight:600">💬 WhatsApp</a>` : '–';
+            return `<tr>
+              <td class="l"><b>${esc(x.r.name)}</b> <small class="note">${x.r.id}</small></td>
+              <td class="l">${esc(x.r.mob || '–')}</td>
+              <td style="font-weight:bold;color:var(--rd);text-align:right">${x.sum}</td>
+              <td style="text-align:center">${wa}</td>
+            </tr>`;
+          }).join('')}
+        </tbody>
+        <tfoot>
+          <tr>
+            <td class="l" colspan="2"><b>Total (${list.length} shops)</b></td>
+            <td style="font-weight:bold;color:var(--rd);text-align:right"><b>${grand}</b></td>
+            <td></td>
+          </tr>
+        </tfoot>
+      </table>
+    ` : '<p class="note" style="padding:16px;text-align:center">No unreturned crates matching search.</p>';
+  };
+
+  const totalHeld = S.ret.reduce((a, r) => a + balTot(r.id, D, 1), 0);
+  const totalRet = S.ret.filter(r => balTot(r.id, D, 1) > 0).length;
+
+  d.innerHTML = `
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+      <h3 style="margin:0">📦 Where Crates Are Not Returned</h3>
+      <span class="pill r" style="font-size:12px;font-weight:bold;padding:4px 10px">Total Pending: ${totalHeld} Crates</span>
+    </div>
+    <p class="sub" style="margin-bottom:12px">All retailers holding empty/full crates (${totalRet} shops):</p>
+    <div class="bar" style="margin-bottom:10px">
+      <input id="unretSearch" placeholder="Search by shop name or mobile..." style="flex:1" oninput="window.filterUnret(this.value)">
+    </div>
+    <div class="tw" id="unretList" style="max-height:360px;overflow-y:auto"></div>
+    <div class="bar" style="margin-top:14px;justify-content:space-between">
+      <button onclick="$('#dlg').close();tab='bal';nav('crate')">Go to Crate Management</button>
+      <button class="p" onclick="$('#dlg').close()">Close</button>
+    </div>
+  `;
+  window.filterUnret = q => renderTable(q);
+  d.showModal();
+  renderTable();
+}
+const alertTable = A => A.length ? `<div class="tw" style="margin-top:8px"><table><tr><th class="l">Retailer</th><th>Crates held</th><th class="l">Reason</th></tr>${A.map(a => `<tr><td class="l">${esc(a.r.name)}</td><td class="${a.c < 0 ? 'neg' : ''}">${a.c}</td><td class="l">${a.f.map(x => `<span class="pill r">${x}</span>`).join('')}</td></tr>`).join('')}</table></div>` : '<p class="note">No alerts.</p>';
+
+// ---- Interactive Crate Management Modal (Single Retailer & Batch Zero) ----
+function setBagDeliveryToday(rId, isBag) {
+  const q = reqCrates(rId, D);
+  if (isBag) {
+    setReg(rId, 'iss', 0, true);
+    toast(`${RT(rId).name}: 0 crates issued today (Bag delivery)`);
+  } else {
+    setReg(rId, 'iss', q, false);
+    const regTx = S.tx.find(t => t.r == rId && t.date == D && t.src == 'register' && !t.void);
+    if (regTx) regTx.issManual = false;
+    toast(`${RT(rId).name}: Restored auto crates (${q} crates)`);
+  }
+  save();
+  $('#dlg').close();
+  go();
+}
+
+function togglePermanentBag(rId, isPermanent) {
+  const r = RT(rId);
+  if (!r) return;
+  r.noCrates = !!isPermanent;
+  if (r.noCrates) {
+    setReg(rId, 'iss', 0, true);
+  } else {
+    syncAutoCrates(D);
+  }
+  save();
+  go();
+  toast(`${r.name}: ${r.noCrates ? 'Marked as Permanent Bag Customer' : 'Marked as Crate Customer'}`);
+}
+
+function toggleBagToday(rId) {
+  const x = dayTot(rId, D);
+  const regTx = S.tx.find(t => t.r == rId && t.date == D && t.src == 'register' && !t.void);
+  if (x.iss === 0 && regTx && regTx.issManual) {
+    setBagDeliveryToday(rId, false);
+  } else {
+    setBagDeliveryToday(rId, true);
+  }
+}
+
+function openCrateModal(rId) {
+  const r = RT(rId);
+  if (!r) return;
+  const x = dayTot(r.id, D);
+  const d = $('#dlg');
+  d.style.maxWidth = '460px';
+  d.style.width = '94%';
+
+  d.innerHTML = `
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;border-bottom:1px solid var(--bd);padding-bottom:8px">
+      <div>
+        <h3 style="margin:0;font-size:17px">📦 ${esc(r.name)}</h3>
+        <small class="note">${r.id} · Route: ${r.route || 'General'}</small>
+      </div>
+      <span class="pill ${r.noCrates ? 'r' : (x.iss === 0 && x.regTx && x.regTx.issManual ? 'r' : 'a')}">${r.noCrates ? '🎒 Permanent Bag Retailer' : (x.iss === 0 && x.regTx && x.regTx.issManual ? '🎒 Bag Delivery Today (0 Crates)' : 'Crate User')}</span>
+    </div>
+
+    <!-- Quick Crate Summary for Today -->
+    <div style="background:var(--sf);border:1px solid var(--bd);border-radius:8px;padding:12px;margin-bottom:14px">
+      <div style="font-weight:600;margin-bottom:8px;display:flex;justify-content:space-between">
+        <span>Crates for ${fd(D)}:</span>
+        <span style="color:var(--mu);font-size:12px">Milk Req: ${x.q} crates</span>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;text-align:center">
+        <div style="background:var(--bg);padding:8px 4px;border-radius:6px;border:1px solid var(--bd)">
+          <div style="font-size:11px;color:var(--mu)">Prev. Crates<br>(मागील बाकी)</div>
+          <b style="font-size:16px">${x.o}</b>
+        </div>
+        <div style="background:var(--bg);padding:8px 4px;border-radius:6px;border:1px solid var(--bd)">
+          <div style="font-size:11px;color:var(--mu)">Given Today<br>(आज दिले)</div>
+          <b style="font-size:16px;color:var(--p)">${x.iss}</b>
+        </div>
+        <div style="background:var(--bg);padding:8px 4px;border-radius:6px;border:1px solid var(--bd)">
+          <div style="font-size:11px;color:var(--mu)">Returned<br>(परत आले)</div>
+          <b style="font-size:16px">${x.rt}</b>
+        </div>
+        <div style="background:var(--bg);padding:8px 4px;border-radius:6px;border:1px solid var(--bd)">
+          <div style="font-size:11px;color:var(--mu)">Total Balance<br>(एकूण बाकी)</div>
+          <b style="font-size:16px;color:${x.c < 0 ? 'var(--rd)' : 'var(--g)'}">${x.c}</b>
+        </div>
+      </div>
+      <div style="text-align:center;font-size:11px;color:var(--mu);margin-top:8px">
+        Formula: <b>${x.o}</b> (Prev) + <b>${x.iss}</b> (Given) − <b>${x.rt}</b> (Returned) = <b>${x.c}</b> (Total with Shop)
+      </div>
+    </div>
+
+    <!-- 1-Click Action for Bag Delivery Today -->
+    <div style="background:#fef3c7;border:1px solid #f59e0b;border-radius:8px;padding:12px;margin-bottom:14px">
+      <b style="color:#92400e;display:flex;align-items:center;gap:6px">
+        <span>🎒</span> <span>Bag Delivery for Today (0 Crates Today)</span>
+      </b>
+      <p style="margin:4px 0 10px;font-size:12px;color:#78350f;line-height:1.4">
+        If this retailer is taking milk in bags today, click below to set Issued to 0. Yesterday's crate balance and tomorrow's deliveries will remain safe!
+      </p>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="p" style="background:#d97706;border-color:#b45309;color:#fff;padding:6px 12px;font-size:13px" onclick="setBagDeliveryToday('${r.id}', true)">
+          ⚡ Set 0 Crates Today
+        </button>
+        <button class="s" style="padding:6px 12px;font-size:13px" onclick="setBagDeliveryToday('${r.id}', false)">
+          🔄 Restore Auto Crates (${x.q})
+        </button>
+      </div>
+    </div>
+
+    <!-- Permanent Bag Setting -->
+    <div style="border:1px solid var(--bd);border-radius:8px;padding:12px;margin-bottom:14px">
+      <label style="display:flex;align-items:center;gap:8px;cursor:pointer">
+        <input type="checkbox" id="modal_no_crates" ${r.noCrates ? 'checked' : ''} onchange="togglePermanentBag('${r.id}', this.checked)">
+        <span style="font-weight:600">Permanent Bag Customer (Never takes crates)</span>
+      </label>
+      <p class="sub" style="margin:4px 0 0 24px;font-size:12px">
+        Check this ONLY if this retailer permanently takes milk in bags and never uses plastic crates.
+      </p>
+    </div>
+
+    <div style="display:flex;justify-content:flex-end">
+      <button class="p" onclick="$('#dlg').close()">Close</button>
+    </div>
+  `;
+
+  d.showModal();
+}
+
+function openBatchZeroModal() {
+  const d = $('#dlg');
+  d.style.maxWidth = '780px';
+  d.style.width = '95vw';
+
+  const render = () => {
+    d.innerHTML = `
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px">
+        <div>
+          <h3 style="margin:0;font-size:18px;display:flex;align-items:center;gap:6px">
+            <span>🎒</span> <span>Bag Delivery Management</span>
+          </h3>
+          <p class="sub" style="margin:2px 0 0;font-size:12px">Select retailers who take milk in bags without plastic crates.</p>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <input id="batchSearch" placeholder="Search retailer or route..." style="max-width:200px;padding:6px 10px;font-size:12px" oninput="filterBatch(this.value)">
+          <button type="button" onclick="$('#dlg').close()" style="background:none;border:none;font-size:22px;cursor:pointer;color:var(--mu);line-height:1">✕</button>
+        </div>
+      </div>
+
+      <div class="tw" style="max-height:55vh;overflow-y:auto;overflow-x:hidden;border:1px solid var(--bd);border-radius:8px">
+        <table id="batchTable" style="width:100%;table-layout:fixed">
+          <thead>
+            <tr>
+              <th style="width:115px;text-align:center" title="Retailer permanently takes milk in bags on all days">Permanent Bag?</th>
+              <th class="l">Retailer</th>
+              <th class="l hide-mobile" style="width:110px">Route</th>
+              <th style="width:90px;text-align:right" title="Current crates held by shop">Crates Held</th>
+              <th style="width:125px;text-align:center" title="Delivery mode for today">Today Delivery</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${S.ret.map(r => {
+              const x = dayTot(r.id, D);
+              const isBagToday = r.noCrates || (x.iss === 0 && x.regTx && x.regTx.issManual);
+              return `<tr class="batch_row" data-name="${esc(r.name).toLowerCase()} ${esc(r.route || '').toLowerCase()} ${r.id.toLowerCase()}">
+                <td style="text-align:center">
+                  <input type="checkbox" class="batch_ret_perm" value="${r.id}" ${r.noCrates ? 'checked' : ''} style="cursor:pointer;width:18px;height:18px" onchange="batchTogglePerm(this, '${r.id}')" title="Mark permanent bag retailer">
+                </td>
+                <td class="l"><b>${esc(r.name)}</b> <small class="note">${r.id}</small></td>
+                <td class="l hide-mobile">${esc(r.route || '–')}</td>
+                <td style="text-align:right"><b>${x.c}</b></td>
+                <td style="text-align:center">
+                  <button type="button" class="s batch_today_btn" id="today_btn_${r.id}" data-id="${r.id}" data-bag="${isBagToday ? '1' : '0'}" onclick="batchToggleToday('${r.id}')" style="padding:4px 10px;font-size:12px;font-weight:600;min-width:92px;border-radius:4px;cursor:pointer;background:${isBagToday ? '#fed7aa;border-color:#f97316;color:#92400e' : '#f1f5f9;border-color:#cbd5e1;color:#475569'}">
+                    ${isBagToday ? '🎒 Bag (0)' : '📦 Crates'}
+                  </button>
+                </td>
+              </tr>`;
+            }).join('')}
+          </tbody>
+        </table>
+      </div>
+
+      <div class="bar" style="display:flex;justify-content:space-between;align-items:center;margin-top:16px;flex-wrap:wrap;gap:8px">
+        <button type="button" class="s" onclick="$('#dlg').close()">Cancel</button>
+        <button type="button" class="p" style="padding:8px 20px;font-weight:600;display:inline-flex;align-items:center;gap:6px" onclick="saveBatchModal()">
+          💾 Save Changes
+        </button>
+      </div>
+    `;
+
+    window.filterBatch = q => {
+      const qLower = q.toLowerCase();
+      document.querySelectorAll('.batch_row').forEach(row => {
+        row.style.display = row.dataset.name.includes(qLower) ? '' : 'none';
+      });
+    };
+
+    window.batchTogglePerm = (chk, rId) => {
+      const btn = document.getElementById('today_btn_' + rId);
+      if (chk.checked && btn) {
+        btn.dataset.bag = '1';
+        btn.innerHTML = '🎒 Bag (0)';
+        btn.style.background = '#fed7aa';
+        btn.style.borderColor = '#f97316';
+        btn.style.color = '#92400e';
+      }
+    };
+
+    window.batchToggleToday = rId => {
+      const btn = document.getElementById('today_btn_' + rId);
+      if (!btn) return;
+      const isBag = btn.dataset.bag === '1';
+      btn.dataset.bag = isBag ? '0' : '1';
+      if (!isBag) {
+        btn.innerHTML = '🎒 Bag (0)';
+        btn.style.background = '#fed7aa';
+        btn.style.borderColor = '#f97316';
+        btn.style.color = '#92400e';
+      } else {
+        btn.innerHTML = '📦 Crates';
+        btn.style.background = '#f1f5f9';
+        btn.style.borderColor = '#cbd5e1';
+        btn.style.color = '#475569';
+      }
+    };
+
+    window.saveBatchModal = () => {
+      const permChks = document.querySelectorAll('.batch_ret_perm');
+      permChks.forEach(chk => {
+        const r = RT(chk.value);
+        if (r) r.noCrates = chk.checked;
+      });
+
+      const todayBtns = document.querySelectorAll('.batch_today_btn');
+      todayBtns.forEach(btn => {
+        const rId = btn.dataset.id;
+        const isBag = btn.dataset.bag === '1';
+        const q = reqCrates(rId, D);
+        if (isBag) {
+          setReg(rId, 'iss', 0, true);
+        } else {
+          setReg(rId, 'iss', q, false);
+          const regTx = S.tx.find(t => t.r == rId && t.date == D && t.src == 'register' && !t.void);
+          if (regTx) regTx.issManual = false;
+        }
+      });
+
+      syncAutoCrates(D);
+      save();
+      $('#dlg').close();
+      go();
+      toast('Bag delivery settings saved successfully!');
+    };
+  };
+
+  d.showModal();
+  render();
+}
+
+// ---- Daily Register ----
+function pReg() {
+  syncAutoCrates(D);
+  const P = S.prod;
+  let h = `<h1>Daily Register</h1><p class="sub">Retailers × products with crate columns. Quantities automatically advance the Monthly Excel ledger row-by-row.</p>
+<div class="bar"><label>Business date<input type="date" id="dt" value="${D}" onchange="setMasterDate(this.value)"></label>${D !== TODAY ? `<button onclick="setMasterDate(TODAY)">Reset to Today</button>` : ''}${regPill()}<button class="s" onclick="openBatchZeroModal()" title="View & manage bag delivery retailers">🎒 Bag Retailers</button><button onclick="copyReg()">Copy CSV</button><button onclick="exportRegXLSX()">⬇ Download Register (.xlsx)</button><button onclick="window.print()">Print</button></div>
+<div class="tw"><table class="reg" id="reg"><thead><tr><th class="st" rowspan="2">Retailer</th><th colspan="${P.length}">Ordered pouches</th><th colspan="4" class="g" style="letter-spacing:0.3px">Total Crates <span style="font-size:11px;font-weight:normal;opacity:0.9;margin-left:4px">( Prev + Given − Returned = Total )</span></th></tr><tr>${P.map(p => `<th>${p.brand}<br>${p.name}</th>`).join('')}<th class="g" title="Crates retailer already had from yesterday" style="text-align:right">Prev. Crates<br><span style="font-size:10px;font-weight:normal">(मागील)</span></th><th title="Crates delivered today with milk (type 0 if milk taken in bags)" style="text-align:right">Given Today<br><span style="font-size:10px;font-weight:normal">(आज दिले)</span></th><th title="Empty crates returned today" style="text-align:right">Returned<br><span style="font-size:10px;font-weight:normal">(परत आले)</span></th><th title="Total crates currently with retailer" style="text-align:right">Total Balance<br><span style="font-size:10px;font-weight:normal">(एकूण बाकी)</span></th></tr></thead><tbody>`;
+  S.ret.forEach((r, i) => {
+    h += `<tr><td class="st">${esc(r.name)}<small>${r.id} · ${r.route}</small></td>`;
+    P.forEach((p, j) => {
+      const v = ord(r.id, p.id);
+      h += `<td><input type="number" min="0" step="any" class="${v == null ? 'e' : ''}" value="${v == null ? '' : v}" data-t="q" data-id="${r.id}" data-x="${p.id}" data-r="${i}" data-c="${j}"></td>`;
+    });
+    const x = dayTot(r.id, D);
+    const c = P.length;
+    const isBagToday = x.iss === 0 && x.regTx && x.regTx.issManual;
+    const bagBadge = r.noCrates ? '<span class="pill" style="font-size:9px;padding:1px 4px;margin-left:4px;background:#e2e8f0;color:#334155">Bag</span>' : (isBagToday ? '<span class="pill" style="font-size:9px;padding:1px 4px;margin-left:4px;background:#fef3c7;color:#92400e">Bag</span>' : '');
+    h += `<td class="g" id="o_${r.id}" style="text-align:right;cursor:pointer" onclick="openCrateModal('${r.id}')" title="Crates already with ${esc(r.name)} from yesterday">${x.o}</td>
+<td style="text-align:right">
+  <input type="number" min="0" value="${(x.iss !== undefined && x.iss !== null) ? x.iss : ''}" placeholder="${r.noCrates ? '0' : (x.q || '0')}" data-t="i" data-id="${r.id}" data-r="${i}" data-c="${c}" id="i_${r.id}" style="width:60px;text-align:right" title="Crates given today (type 0 if milk taken in bags)">
+</td>
+<td style="text-align:right">
+  <input type="number" min="0" value="${(x.rt !== undefined && x.rt !== null) ? x.rt : ''}" placeholder="0" data-t="r" data-id="${r.id}" data-r="${i}" data-c="${c + 1}" id="r_${r.id}" style="width:60px;text-align:right" title="Empty crates returned today">
+</td>
+<td id="c_${r.id}" class="${x.c < 0 ? 'neg' : ''}" style="text-align:right;cursor:pointer;font-weight:bold" onclick="openCrateModal('${r.id}')" title="Total crates currently with ${esc(r.name)}">${x.c}${bagBadge}</td>`;
+    h += '</tr>';
+  });
+  h += `</tbody><tfoot><tr><td class="st">TOTAL</td>${P.map(p => `<td id="tq_${p.id}"></td>`).join('')}<td class="g" id="to_tot"></td><td id="ti_tot"></td><td id="tr_tot"></td><td id="tc_tot"></td></tr></tfoot></table></div>`;
+  return h;
+}
+
+function refresh() {
+  const Tot = [0, 0, 0, 0];
+  S.ret.forEach(r => {
+    const x = dayTot(r.id, D);
+    const oEl = $('#o_' + r.id);
+    if (oEl) {
+      const span = oEl.querySelector('span');
+      if (span) span.textContent = x.o;
+      else oEl.textContent = x.o;
+    }
+    const cEl = $('#c_' + r.id);
+    if (cEl) {
+      const bTag = cEl.querySelector('b');
+      if (bTag) bTag.textContent = x.c;
+      else cEl.textContent = x.c;
+      cEl.className = x.c < 0 ? 'neg' : '';
+    }
+    const iEl = $('#i_' + r.id);
+    if (iEl) {
+      const regTx = S.tx.find(t => t.r == r.id && t.date == D && t.src == 'register' && !t.void);
+      if (!regTx || !regTx.issManual) {
+        iEl.value = (x.iss !== undefined && x.iss !== null) ? x.iss : '';
+      }
+      iEl.placeholder = r.noCrates ? '0' : (x.q || '0');
+    }
+    const rEl = $('#r_' + r.id);
+    if (rEl) {
+      if (rEl.value === '' && x.rt) rEl.value = x.rt;
+    }
+    [x.o, x.iss, x.rt, x.c].forEach((v, i) => Tot[i] += v);
+  });
+  S.prod.forEach(p => {
+    let tCrate = 0, tBag = 0;
+    S.ret.forEach(r => {
+      const q = ord(r.id, p.id) || 0;
+      if (q > 0) {
+        if (isBagRetailer(r, D)) tBag += q;
+        else tCrate += q;
+      }
+    });
+    const t = tCrate + tBag;
+    const el = $('#tq_' + p.id);
+    if (el) {
+      el.innerHTML = `${t}<small>${formatReqCrates(tCrate, tBag, p.cap)}</small>`;
+    }
+  });
+  if ($('#to_tot')) $('#to_tot').textContent = Tot[0];
+  if ($('#ti_tot')) $('#ti_tot').textContent = Tot[1];
+  if ($('#tr_tot')) $('#tr_tot').textContent = Tot[2];
+  if ($('#tc_tot')) $('#tc_tot').textContent = Tot[3];
+}
+
+function commit(el) {
+  if (S.fin[D] == 'Finalized' && el.dataset.t == 'q') {
+    toast('Day is finalized – reopen it from Milk Requirement');
+    go();
+    return;
+  }
+  const { t, id, x } = el.dataset, v = el.value === '' ? undefined : Math.max(0, t == 'q' ? +el.value : Math.floor(+el.value));
+  if (t == 'q') {
+    S.orders[D] = S.orders[D] || {};
+    S.orders[D][id] = S.orders[D][id] || {};
+    if (v === undefined) delete S.orders[D][id][x];
+    else S.orders[D][id][x] = v;
+    el.classList.toggle('e', v === undefined);
+    syncAutoCrates(D);
+  } else {
+    setReg(id, t == 'i' ? 'iss' : 'ret', v, t == 'i');
+  }
+  save();
+  refresh();
+}
+
+function setReg(r, f, v, isManual = false) {
+  const oth = sum(act().filter(t => t.r == r && t.date == D && t.src != 'register'), f);
+  const q = reqCrates(r, D);
+  const regTxs = S.tx.filter(t => t.r == r && t.date == D && t.src == 'register' && !t.void);
+  let g = regTxs[0];
+
+  if (v === undefined && f === 'iss') {
+    if (g) {
+      g.issManual = false;
+      g.iss = q;
+    }
+    return;
+  }
+
+  const nv = Math.max(0, (v != null ? v : (f === 'iss' ? q : 0)) - oth);
+
+  if (!g) {
+    if (!nv && f !== 'iss') return;
+    g = { id: S.seq++, date: D, r, b: 'Total', iss: f === 'iss' ? nv : q, ret: f === 'ret' ? nv : 0, loose: 0, cap: 12, note: 'Daily register delivery', src: 'register', void: 0, issManual: f === 'iss' && isManual };
+    S.tx.push(g);
+  } else {
+    if (regTxs.length > 1) {
+      const otherF = f === 'iss' ? 'ret' : 'iss';
+      const otherSum = sum(regTxs, otherF);
+      g[otherF] = otherSum;
+      g.b = 'Total';
+      for (let i = 1; i < regTxs.length; i++) regTxs[i].void = 1;
+    }
+  }
+
+  if (f === 'iss' && isManual) g.issManual = true;
+  if (g[f] == nv) return;
+  log('Register entry', `${RT(r).name} · Crates · ${f == 'iss' ? 'issued' : 'returned'} ${g[f]} → ${nv} on ${D}`);
+  g[f] = nv;
+}
+
+document.addEventListener('keydown', e => {
+  const el = e.target;
+  if (!el.matches || !el.matches('#reg input')) return;
+  const m = { Enter: [1, 0], ArrowDown: [1, 0], ArrowUp: [-1, 0], ArrowRight: [0, 1], ArrowLeft: [0, -1] }[e.key];
+  if (!m) return;
+  e.preventDefault();
+  commit(el);
+  const n = document.querySelector(`#reg input[data-r="${+el.dataset.r + m[0]}"][data-c="${+el.dataset.c + m[1]}"]`);
+  if (n) { n.focus(); n.select(); }
+});
+document.addEventListener('change', e => { if (e.target.matches && e.target.matches('#reg input')) commit(e.target); });
+
+function copy(txt) {
+  try {
+    navigator.clipboard.writeText(txt).then(() => toast('CSV copied to clipboard'), () => toast('Copy blocked – use Export'));
+  } catch (e) { toast('Copy blocked – use Export'); }
+}
+
+function copyReg() {
+  const L = [['Retailer', ...S.prod.map(p => p.brand + ' ' + p.name), 'Crates Opening', 'Crates Issued', 'Crates Returned', 'Crates Closing'].join(',')];
+  S.ret.forEach(r => {
+    const x = dayTot(r.id, D);
+    L.push([`"${r.name}"`, ...S.prod.map(p => ord(r.id, p.id) ?? ''), x.o, x.iss, x.rt, x.c].join(','));
+  });
+  copy(L.join('\n'));
+}
+
+function exportRegXLSX() {
+  const rows = [];
+  const h1 = ['Retailer', ...S.prod.map(p => p.brand + ' ' + p.name), 'Crates Opening', 'Crates Issued', 'Crates Returned', 'Crates Closing'];
+  rows.push(h1);
+  S.ret.forEach(r => {
+    const row = [r.name];
+    S.prod.forEach(p => row.push(ord(r.id, p.id) ?? ''));
+    const x = dayTot(r.id, D);
+    row.push(x.o, x.iss, x.rt, x.c);
+    rows.push(row);
+  });
+  downloadExcelAOA(rows, `Daily_Register_${D}.xlsx`, `Register_${D}`);
+}
+
+// ---- Crate Management ----
+function pCrate() {
+  const T = [['bal', 'Balances & Alerts'], ['aud', 'Audit Trail']];
+  if (!['bal', 'aud'].includes(tab)) tab = 'bal';
+  return `<h1>Crate Management</h1><p class="sub">Crates are tracked per retailer, unified across all milk brands.</p><div class="tabs">${T.map(t => `<button class="${tab == t[0] ? 'on' : ''}" onclick="tab='${t[0]}';go()">${t[1]}</button>`).join('')}</div>` + ({ bal: tBal, aud: tAud }[tab] || tBal)();
+}
+function tBal() {
+  const A = alerts();
+  const totHeld = S.ret.reduce((a, r) => a + balTot(r.id, D, 1), 0);
+  return `<div class="bar" style="margin-bottom:12px">
+  <label style="cursor:pointer">Business date<input type="date" value="${D}" style="cursor:pointer" onclick="try{this.showPicker()}catch(e){}" onchange="setMasterDate(this.value)"></label>
+  ${D !== TODAY ? `<button onclick="setMasterDate(TODAY)">Reset to Today</button>` : ''}
+</div>
+<div class="cards"><div class="card"><b style="font-size:26px;color:var(--g)">${totHeld}</b><span>Total Crates Held on ${fd(D)}</span></div></div>
+<div class="box"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px"><b>⚠ Alerts</b><button class="s" onclick="openBatchZeroModal()">🎒 Manage Bag Retailers</button></div><span class="note">(high balance ≥ ${S.cfg.hi}, or no return for ${S.cfg.days}+ days)</span>${alertTable(A)}</div>
+<div class="tw"><table><tr><th class="l">Retailer</th><th style="text-align:right" title="Crates with retailer before today">Prev. Crates<br><span style="font-size:10px;font-weight:normal">(मागील)</span></th><th style="text-align:right" title="Crates delivered today with milk">Given Today<br><span style="font-size:10px;font-weight:normal">(आज दिले)</span></th><th style="text-align:right" title="Empty crates returned today">Returned<br><span style="font-size:10px;font-weight:normal">(परत आले)</span></th><th style="text-align:right" title="Total crates currently with retailer">Total Balance<br><span style="font-size:10px;font-weight:normal">(एकूण बाकी)</span></th><th style="text-align:center">Action</th></tr>${S.ret.map(r => { const x = dayTot(r.id, D); return `<tr><td class="l">${esc(r.name)}<small class="note"> ${r.route}</small></td><td style="cursor:pointer;text-align:right" onclick="openCrateModal('${r.id}')" title="Click to view/manage crates">${x.o}</td><td style="text-align:right">${x.iss}</td><td style="text-align:right">${x.rt}</td><td class="${x.c < 0 ? 'neg' : ''}" style="cursor:pointer;text-align:right;font-weight:bold" onclick="openCrateModal('${r.id}')" title="Click to view/manage crates">${x.c}</td><td style="text-align:center"><button class="s" onclick="openCrateModal('${r.id}')">${r.noCrates ? '🎒 Bag (0)' : 'Manage'}</button></td></tr>`; }).join('')}</table></div>`;
+}
+
+function tLed() {
+  const R = rows().filter(t => (!fR || t.r == fR)).reverse();
+  return `<div class="box"><b>Record crate movement</b><div class="bar" style="margin-top:8px"><label>Date<input type="date" id="nd" value="${D}"></label><label>Retailer<select id="nr">${S.ret.map(r => `<option value="${r.id}">${esc(r.name)}</option>`).join('')}</select></label><label>Issued<input id="ni" type="number" min="0" value="0" style="width:70px"></label><label>Returned<input id="nt" type="number" min="0" value="0" style="width:70px"></label><label>Note<input id="nn" style="width:180px"></label><button class="p" onclick="addTx()">Add</button></div></div>
+<div class="bar"><label>Retailer<select onchange="fR=this.value;go()"><option value="">All</option>${S.ret.map(r => `<option value="${r.id}" ${fR == r.id ? 'selected' : ''}>${esc(r.name)}</option>`).join('')}</select></label></div>
+<div class="tw"><table><tr><th class="l">Date</th><th class="l">Retailer</th><th>Opening</th><th>Issued</th><th>Returned</th><th>Closing</th><th class="l">Source / note</th><th></th></tr>
+${R.map(t => `<tr class="${t.void ? 'void' : ''}"><td class="l">${fd(t.date)}</td><td class="l">${esc(RT(t.r).name)}</td><td>${t.void ? '–' : t.o}</td><td>${t.iss}</td><td>${t.ret}</td><td class="${t.c < 0 ? 'neg' : ''}"><b>${t.void ? '–' : t.c}</b></td><td class="l">${t.src}${t.note ? ' · ' + esc(t.note) : ''}</td><td>${t.void ? '<span class="pill r">void</span>' : `<button class="s" onclick="edTx(${t.id})">Edit</button> <button class="s" onclick="voidTx(${t.id})">Void</button>`}</td></tr>`).join('')}</table></div><p class="note">Closing = Opening + Issued − Returned.</p>`;
+}
+
+function addTx() {
+  const g = i => Math.max(0, Math.floor(+$('#' + i).value || 0)), t = { id: S.seq++, date: $('#nd').value, r: $('#nr').value, b: 'Total', iss: g('ni'), ret: g('nt'), loose: 0, cap: 12, note: $('#nn').value, src: 'ledger', void: 0 };
+  if (!t.date || (!t.iss && !t.ret)) return toast('Enter crates issued or returned');
+  S.tx.push(t);
+  log('Added', `${RT(t.r).name} · Crates · issued ${t.iss}, returned ${t.ret} on ${t.date}`);
+  save();
+  go();
+  toast('Saved · balances updated');
+}
+
+function edTx(id) {
+  const t = S.tx.find(x => x.id == id), d = $('#dlg');
+  d.innerHTML = `<h3>Edit transaction</h3><label>Date<input id="ed" type="date" value="${t.date}"></label><label>Issued<input id="ei" type="number" min="0" value="${t.iss}"></label><label>Returned<input id="er" type="number" min="0" value="${t.ret}"></label><label>Reason for change (required)<input id="ew"></label><div class="bar"><button class="p" onclick="saveEd(${id})">Save</button><button onclick="$('#dlg').close()">Cancel</button></div>`;
+  d.showModal();
+}
+
+function saveEd(id) {
+  const t = S.tx.find(x => x.id == id), w = $('#ew').value.trim();
+  if (!w) return toast('Please give a reason');
+  const n = { date: $('#ed').value || t.date, iss: Math.max(0, +$('#ei').value || 0), ret: Math.max(0, +$('#er').value || 0) };
+  log('Edited', `${RT(t.r).name} · Crates: ${t.date}/${t.iss}/${t.ret} → ${n.date}/${n.iss}/${n.ret}`, w);
+  Object.assign(t, n);
+  save();
+  $('#dlg').close();
+  go();
+  toast('Updated · later balances recalculated');
+}
+
+function voidTx(id) {
+  const w = prompt('Reason for voiding this entry?');
+  if (!w) return;
+  const t = S.tx.find(x => x.id == id);
+  t.void = 1;
+  log('Voided', `${RT(t.r).name} · Crates · issued ${t.iss}, returned ${t.ret} on ${t.date}`, w);
+  save();
+  go();
+}
+
+function tCap() {
+  return `<div class="box"><b>Pouches per crate</b><div class="tw" style="margin-top:8px"><table><tr><th class="l">Brand</th><th class="l">Product / variant</th><th>Rate ₹</th><th>Pouches per crate</th></tr>${S.prod.map(p => `<tr><td class="l">${p.brand}</td><td class="l">${p.name}</td><td>${p.rate}</td><td><input type="number" min="1" value="${p.cap}" style="width:70px" onchange="setCap('${p.id}',this.value)"></td></tr>`).join('')}</table></div></div>
+<div class="box"><b>Alert &amp; bill policy</b><div class="bar" style="margin-top:8px"><label>High balance at (crates)<input type="number" value="${S.cfg.hi}" onchange="S.cfg.hi=+this.value||1;save()"></label><label>No return after (days)<input type="number" value="${S.cfg.days}" onchange="S.cfg.days=+this.value||1;save()"></label><label>Crate deposit/charge per issued crate (₹)<input type="number" min="0" value="${S.cfg.dep}" onchange="S.cfg.dep=Math.max(0,+this.value||0);save()"></label></div></div>`;
+}
+
+function setCap(id, v) {
+  const p = S.prod.find(x => x.id == id), n = Math.max(1, Math.floor(+v || 1));
+  log('Capacity changed', `${p.brand} ${p.name}: ${p.cap} → ${n} pouches/crate`);
+  p.cap = n;
+  save();
+  toast('Capacity updated');
+}
+
+function repData() {
+  const { m, f, t } = RP, out = [];
+  if (m == 'date') {
+    for (let d = f; d <= t; d = addD(d, 1)) {
+      const X = act().filter(x => x.date == d), o = S.ret.reduce((a, r) => a + balTot(r.id, d), 0), i = sum(X, 'iss'), r = sum(X, 'ret');
+      out.push([fd(d), 'All', o, i, r, o + i - r]);
+    }
+    return out;
+  }
+  S.ret.forEach(r => {
+    const o = balTot(r.id, f), X = act().filter(x => x.r == r.id && x.date >= f && x.date <= t), i = sum(X, 'iss'), rr = sum(X, 'ret');
+    out.push([r.name, r.id, o, i, rr, o + i - rr]);
+  });
+  return out;
+}
+
+function tRep() {
+  const D2 = repData();
+  const head = ['Retailer / Date', 'ID', 'Opening', 'Issued', 'Returned', 'Closing'];
+  return `<div class="bar"><label>Report<select onchange="RP.m=this.value;go()"><option value="ret" ${RP.m == 'ret' ? 'selected' : ''}>Retailer-wise</option><option value="date" ${RP.m == 'date' ? 'selected' : ''}>Date-wise</option></select></label><label>From<input type="date" value="${RP.f}" onchange="RP.f=this.value;go()"></label><label>To<input type="date" value="${RP.t}" onchange="RP.t=this.value;go()"></label><button onclick="copy([head].concat(repData()).join('\\n'))">Copy CSV</button><button onclick="window.print()">Print</button></div>
+<div class="tw"><table><tr>${head.map((h, i) => `<th class="${i < 2 ? 'l' : ''}">${h}</th>`).join('')}</tr>${D2.map(r => `<tr>${r.map((v, i) => `<td class="${i < 2 ? 'l' : ''}">${esc(v)}</td>`).join('')}</tr>`).join('')}<tr><td class="l"><b>Total</b></td><td></td>${[2, 3, 4, 5].map(k => `<td><b>${D2.reduce((a, x) => a + x[k], 0)}</b></td>`).join('')}</tr></table></div>`;
+}
+
+function tAud() {
+  return `<div class="tw"><table><tr><th class="l">When</th><th class="l">Action</th><th class="l">Detail</th><th class="l">Reason</th></tr>${S.audit.map(a => `<tr><td class="l">${a.t}</td><td class="l">${a.a}</td><td class="l">${esc(a.d)}</td><td class="l">${esc(a.why)}</td></tr>`).join('') || '<tr><td class="l" colspan="4">No changes yet.</td></tr>'}</table></div><div class="bar" style="margin-top:12px"><button onclick="if(confirm('Reset all demo data?')){S=seed();fix();save();go()}">Reset demo data</button></div>`;
+}
+
+const MR = ['डॅशबोर्ड', 'दैनिक नोंदवही', 'दूध मागणी', 'किरकोळ विक्रेते', 'उत्पादने व दर', 'दैनिक बिल', 'पेमेंट व वसुली', 'क्रेट व्यवस्थापन', 'अहवाल', 'मासिक नोंद', 'सेटिंग्ज'];
+let RQ = '', RS = '', rtab = 'ov', RPT = 'req', CSV = '';
+
+function fix() {
+  const c = S.cfg;
+  if (!c.cut || c.cut === '18:00') c.cut = '16:00';
+  c.biz = c.biz || 'निखिल दुध डेअरी (Nikhil Milk Dairy Pune)';
+  c.pre = c.pre || 'INV';
+  c.pm = c.pm || 'Cash,UPI,Bank Transfer,Cheque,Other';
+  if (c.auto15 === undefined) c.auto15 = 1;
+  if (c.lastAuto15 === undefined) c.lastAuto15 = '';
+  if (c.lastAutoType === undefined) c.lastAutoType = '';
+  if (!Array.isArray(c.autoHistory)) c.autoHistory = [];
+  if (!c.auth || typeof c.auth !== 'object') {
+    c.auth = { enabled: 1, user: 'admin', pass: '1234' };
+  } else {
+    if (c.auth.enabled === undefined) c.auth.enabled = 1;
+    c.auth.user = (c.auth.user || 'admin').trim();
+    c.auth.pass = (c.auth.pass !== undefined && c.auth.pass !== null && c.auth.pass !== '') ? String(c.auth.pass) : '1234';
+  }
+  S.intake = S.intake || [];
+  S.fin = S.fin || {};
+  S.snap = S.snap || {};
+  S.pay = S.pay || [];
+  S.orders = S.orders || {};
+}
+
+const T = (h, r, l = 1) => `<div class="tw"><table><tr>${h.map((x, i) => `<th class="${i < l ? 'l' : ''}">${x}</th>`).join('')}</tr>${r.map(x => `<tr>${x.map((v, i) => `<td class="${i < l ? 'l' : ''}">${v}</td>`).join('')}</tr>`).join('') || `<tr><td class="l" colspan="${h.length}">Nothing yet</td></tr>`}</table></div>`, csv = (h, r) => { CSV = [h, ...r].map(x => x.map(v => '"' + String(v).replace(/<[^>]*>/g, '') + '"').join(',')).join('\n'); }, dt = () => `<label style="cursor:pointer">Date<input type="date" value="${D}" style="cursor:pointer" onclick="try{this.showPicker()}catch(e){}" onchange="setMasterDate(this.value)"></label>${D !== TODAY ? `<button onclick="setMasterDate(TODAY)" style="margin-left:6px">Reset to Today</button>` : ''}`;
+
+function pReq() {
+  const bagNames = new Set();
+  let totBagPouches = 0;
+  const R = S.prod.map(p => {
+    let tCrate = 0, tBag = 0, retCount = 0;
+    S.ret.forEach(r => {
+      const q = ord(r.id, p.id) || 0;
+      if (q > 0) {
+        retCount++;
+        if (isBagRetailer(r, D)) {
+          tBag += q;
+          bagNames.add(r.name);
+        } else {
+          tCrate += q;
+        }
+      }
+    });
+    const t = tCrate + tBag;
+    totBagPouches += tBag;
+    const crStr = formatReqCrates(tCrate, tBag, p.cap);
+    return [p.brand, p.name, t, retCount, p.cap, crStr, inr(t * rate(p, D)), t * rate(p, D), tCrate, tBag];
+  }), V = R.map(r => r.slice(0, 7));
+  csv(['Brand', 'Product', 'Pouches', 'Retailers', 'Per crate', 'Crates Required', 'Value'], V);
+  const totPouches = R.reduce((a, r) => a + r[2], 0);
+  const totVal = inr(R.reduce((a, r) => a + r[7], 0));
+  const bagNote = totBagPouches > 0 ? `<div style="margin-top:10px;padding:8px 12px;background:#fef3c7;border:1px solid #f59e0b;border-radius:6px;font-size:12px;color:#92400e;display:flex;align-items:center;gap:6px"><span>💡</span><span><b>${S.cfg.mr ? 'टीप:' : 'Note:'}</b> ${S.cfg.mr ? `<b>${Array.from(bagNames).map(esc).join(', ')}</b> यांच्यासाठी <b>${totBagPouches} पाकिटे सुटी (loose)</b> जातील (त्यांना क्रेट दिलेले नाहीत).` : `Retailer <b>${Array.from(bagNames).map(esc).join(', ')}</b> takes <b>${totBagPouches} loose pouches</b> (no plastic crates needed).`}</span></div>` : '';
+  return `<h1>Milk Requirement</h1><div class="bar">${dt()}${regPill()}<span class="note">Cut-off ${S.cfg.cut}</span>${fin() == 'Finalized' ? '<button onclick="reopen()">Reopen register</button>' : '<button class="p" onclick="finalize()">Finalize day</button>'}<button onclick="copy(CSV)">Copy CSV</button><button onclick="window.print()">Print</button></div>` + T(['Brand', 'Product', 'Pouches ordered', 'Retailers', 'Pouches/crate', 'Crates required', 'Sales value'], V, 2) + `<p class="note">Brands and pack sizes are never combined. Total ${totPouches} pouches · ${totVal}.</p>${bagNote}`;
+}
+
+function finalize() {
+  if (!confirm('Finalize this day? Quantities lock and current rates are frozen on the bills.')) return;
+  S.fin[D] = 'Finalized';
+  S.snap[D] = Object.fromEntries(S.prod.map(p => [p.id, p.rate]));
+  log('Finalized', D);
+  save();
+  go();
+  toast('Day Finalized and Locked');
+}
+function reopen() {
+  const w = prompt('Reason for reopening?');
+  if (!w) return;
+  S.fin[D] = 'Reopened';
+  delete S.snap[D];
+  log('Reopened', D, w);
+  save();
+  go();
+  toast('Day Reopened');
+}
+
+function pRet() {
+  const q = RQ.toLowerCase();
+  return `<h1>Retailers</h1><div class="bar"><label>Search<input value="${esc(RQ)}" onchange="RQ=this.value;go()" placeholder="name, route, ID"></label></div><div class="box"><b>Add retailer</b><div class="bar" style="margin-top:6px"><label>Shop name<input id="an"></label><label>Route<input id="ar" style="width:100px"></label><label>Mobile<input id="am" style="width:110px"></label><label>Opening balance ₹<input id="ab" type="number" value="0" style="width:100px"></label><button class="p" onclick="addRet()">Add</button></div></div>` + T(['ID', 'Shop', 'Route', 'Mobile', 'Outstanding', 'Crates held', 'Action'], S.ret.filter(r => (r.name + r.id + r.route + (r.mob || '')).toLowerCase().includes(q)).map(r => [r.id, esc(r.name), r.route, r.mob || '–', fb(outst(r.id)), held(r.id), `<button class="s" onclick="editRet('${r.id}')">Edit</button>`]), 4);
+}
+
+function editRet(id) {
+  const r = RT(id);
+  if (!r) return;
+  const d = $('#dlg');
+  d.innerHTML = `<h3>Edit Retailer (${esc(r.id)})</h3>
+    <label>Shop name<input id="ed_rn" value="${esc(r.name)}"></label>
+    <label>Route<input id="ed_rr" value="${esc(r.route || '')}"></label>
+    <label>Mobile<input id="ed_rm" value="${esc(r.mob || '')}"></label>
+    <label>Opening balance ₹<input id="ed_rb" type="number" value="${r.prevOut || 0}"></label>
+    <div class="bar" style="margin-top:16px;display:flex;justify-content:space-between;align-items:center">
+      <button class="s" style="color:var(--rd);border-color:var(--rd)" onclick="$('#dlg').close();delRet('${r.id}')">🗑️ Delete Retailer</button>
+      <div style="display:inline-flex;gap:8px">
+        <button class="p" onclick="saveEditRet('${r.id}')">Save Changes</button>
+        <button onclick="$('#dlg').close()">Cancel</button>
+      </div>
+    </div>`;
+  d.showModal();
+}
+
+function saveEditRet(id) {
+  const r = RT(id);
+  if (!r) return;
+  const n = $('#ed_rn').value.trim();
+  if (!n) return toast('Enter shop name');
+  const old = r.name;
+  r.name = n;
+  r.route = $('#ed_rr').value.trim() || '–';
+  r.mob = $('#ed_rm').value.trim();
+  r.prevOut = +$('#ed_rb').value || 0;
+  log('Retailer edited', `${old} (${id}) updated`);
+  save();
+  $('#dlg').close();
+  go();
+  toast('Retailer details updated');
+}
+
+function delRet(id) {
+  const r = RT(id);
+  if (!r) return;
+
+  // 1st Confirmation
+  if (!confirm(`Are you sure you want to delete retailer "${r.name}" (${r.id})?`)) return;
+
+  // 2nd Confirmation (Double Verification)
+  if (!confirm(`Final Confirmation: Are you really sure you want to permanently delete "${r.name}"? All associated orders and crate records will be removed.`)) return;
+
+  const name = r.name;
+  S.ret = S.ret.filter(x => x.id !== id);
+  for (const date in S.orders) {
+    if (S.orders[date] && S.orders[date][id]) {
+      delete S.orders[date][id];
+    }
+  }
+  if (S.pay) S.pay = S.pay.filter(x => x.r !== id);
+  if (S.tx) S.tx = S.tx.filter(x => x.r !== id);
+  if (S.intake) S.intake = S.intake.filter(x => x.r !== id);
+  if (BL === id) BL = S.ret[0] ? S.ret[0].id : '';
+  if (RS === id) RS = '';
+
+  log('Retailer deleted', `${name} (${id})`);
+  save();
+  go();
+  toast(`Retailer "${name}" deleted successfully`);
+}
+
+function addRet() {
+  const n = $('#an').value.trim();
+  if (!n) return toast('Enter shop name');
+  const id = 'R' + (Math.max(...S.ret.map(r => +r.id.slice(1))) + 1);
+  S.ret.push({ id, name: n, route: $('#ar').value || '–', mob: $('#am').value, prevOut: +$('#ab').value || 0, open: Object.fromEntries(BR.map(b => [b, 0])) });
+  log('Retailer added', n);
+  save();
+  go();
+  toast('Retailer added');
+}
+const openR = id => { RS = id; rtab = 'ov'; page = 'ret'; go(); };
+
+function pProf() {
+  const r = RT(RS), TB = [['ov', 'Overview'], ['ord', 'Orders'], ['bl', 'Bills'], ['py', 'Payments'], ['cr', 'Crate Ledger'], ['lg', 'Account Ledger']];
+  let b;
+  if (rtab == 'ov') b = `<div class="cards"><div class="card"><b>${fb(outst(r.id))}</b><span>Outstanding</span></div><div class="card"><b>${balTot(r.id, D, 1)}</b><span>Total crates held on ${fd(D)}</span></div></div><div class="box">Route: ${r.route} · Mobile: ${r.mob || '–'} · Opening balance ${inr(r.prevOut || 0)} · <span class="pill">Active</span></div>`;
+  else if (rtab == 'ord') b = T(['Date', 'Time', 'Source', 'Items', 'Status'], S.intake.filter(o => o.r == r.id).map(o => [fd(o.date), o.time, o.src, Object.entries(o.items).map(([k, v]) => pn(k) + ': ' + v).join(', '), o.st]), 1);
+  else if (rtab == 'bl') b = T(['Invoice', 'Date', 'Amount'], billed(r.id, D) ? [[inv(r.id, D), fd(D), inr(billed(r.id, D))]] : [], 1) + `<div class="bar" style="margin-top:8px"><button onclick="BL='${r.id}';nav('bill')">Open bill</button></div>`;
+  else if (rtab == 'py') b = T(['Date', 'Amount', 'Method', 'Ref', 'Applied to'], S.pay.filter(x => x.r == r.id && !x.void).map(x => [fd(x.date), inr(x.amt), x.m, x.ref, x.al]), 1);
+  else if (rtab == 'cr') b = T(['Date', 'Opening', 'Issued', 'Returned', 'Closing'], rows().filter(t => t.r == r.id && !t.void).reverse().map(t => [fd(t.date), t.o, t.iss, t.ret, t.c]), 1);
+  else {
+    let c = r.prevOut || 0;
+    const L = [['—', 'Opening balance', '', inr(c)]];
+    Object.keys(S.orders).sort().forEach(d => {
+      const bi = billed(r.id, d);
+      if (bi) { c += bi; L.push([fd(d), 'Bill ' + inv(r.id, d), '+' + inr(bi), inr(c)]); }
+    });
+    S.pay.filter(x => x.r == r.id).forEach(x => {
+      if (x.void) L.push([fd(x.date), 'Payment ' + x.m + ' (voided)', '', inr(c)]);
+      else { c -= x.amt; L.push([fd(x.date), 'Payment ' + x.m, '−' + inr(x.amt), inr(c)]); }
+    });
+    b = T(['Date', 'Entry', 'Change', 'Balance'], L, 2);
+  }
+  return `<h1>${esc(r.name)} <small class="note">${r.id}</small></h1><div class="bar"><button onclick="RS='';go()">← All retailers</button></div><div class="tabs">${TB.map(t => `<button class="${rtab == t[0] ? 'on' : ''}" onclick="rtab='${t[0]}';go()">${t[1]}</button>`).join('')}</div>` + b;
+}
+
+function allBrands() {
+  return Array.from(new Set([...BR, ...S.prod.map(p => p.brand).filter(Boolean)])).sort();
+}
+
+function pProd() {
+  const brandsList = allBrands();
+  return `<h1>Products & Pricing</h1><p class="sub">Rate changes apply to new bills. Finalizing a day freezes that day's rates. You can select existing brands or type any new brand.</p>` +
+    T(['Brand', 'Product', 'Rate ₹', 'Pouches / crate'], S.prod.map(p => [
+      `<input list="brandDatalist" value="${esc(p.brand)}" style="width:130px;font-weight:600" onchange="setBrand('${p.id}',this.value)" placeholder="Brand">`,
+      p.name,
+      `<input type="number" min="0" step="any" value="${p.rate}" style="width:80px" onchange="setRate('${p.id}',this.value)">`,
+      `<input type="number" min="1" value="${p.cap}" style="width:70px" onchange="setCap('${p.id}',this.value)">`
+    ]), 2) +
+    `<datalist id="brandDatalist">
+      ${brandsList.map(b => `<option value="${esc(b)}"></option>`).join('')}
+    </datalist>` +
+    `<div class="box" style="margin-top:14px;border:1px solid var(--bd)">
+      <b>➕ Add Product (नवीन उत्पादन / ब्रँड जोडा)</b>
+      <div class="bar" style="margin-top:8px">
+        <label>Brand (निवडा किंवा नवीन टाईप करा)
+          <input id="pb" list="brandDatalist" style="width:160px;font-weight:600" placeholder="Type or select brand..." value="${brandsList[0] || 'Gokul'}">
+        </label>
+        <label>Name / pack (उत्पादनाचे नाव / प्रमाण)
+          <input id="pnm" placeholder="उदा. Cow 500ml, Dahi 200g..." style="width:180px">
+        </label>
+        <label>Rate ₹ (दर)
+          <input id="prt" type="number" step="any" style="width:90px" placeholder="0.00">
+        </label>
+        <label>Per crate (क्रेट क्षमता)
+          <input id="pcp" type="number" value="12" min="1" style="width:80px">
+        </label>
+        <button class="p" onclick="addProd()">Add Product</button>
+      </div>
+      <div style="font-size:12px;color:var(--mu);margin-top:4px">
+        💡 <b>टीप:</b> जर नवीन ब्रँड असेल (उदा. Mother Dairy, Katraj, Mahanand), तर फक्त Brand बॉक्समध्ये थेट नाव टाईप करा. तो आपोआप सेव्ह होईल!
+      </div>
+    </div>`;
+}
+
+function setBrand(id, v) {
+  const p = S.prod.find(x => x.id == id);
+  if (!p) return;
+  const newB = (v || '').trim();
+  if (!newB) return toast('Brand cannot be empty');
+  const oldB = p.brand;
+  p.brand = newB;
+  log('Brand changed', `${oldB} → ${newB} (${p.name})`);
+  save();
+  toast(`Brand updated to "${newB}"`);
+  go();
+}
+
+function setRate(id, v) {
+  const p = S.prod.find(x => x.id == id), n = Math.max(0, +v || 0);
+  log('Rate changed', `${p.brand} ${p.name}: ₹${p.rate} → ₹${n}`);
+  p.rate = n;
+  save();
+  toast('Rate updated');
+}
+
+function addProd() {
+  const b = ($('#pb').value || '').trim();
+  const n = $('#pnm').value.trim();
+  const rt = +$('#prt').value;
+  if (!b) return toast('कृपया ब्रँडचे नाव प्रविष्ट करा / Please enter brand name');
+  if (!n) return toast('कृपया उत्पादनाचे नाव प्रविष्ट करा / Please enter product name');
+  if (!(rt >= 0) || $('#prt').value === '') return toast('कृपया योग्य दर प्रविष्ट करा / Please enter valid rate');
+  const cap = Math.max(1, +$('#pcp').value || 12);
+
+  S.prod.push({
+    id: 'p' + S.seq++,
+    brand: b,
+    name: n,
+    cap: cap,
+    rate: rt
+  });
+
+  log('Product added', `${b} - ${n} (₹${rt}, ${cap}/crate)`);
+  save();
+  go();
+  toast(`✅ Product "${b} ${n}" added successfully!`);
+}
+
+function pPay() {
+  const pd = S.pay.filter(x => x.date == D && !x.void), cash = pd.filter(x => x.m == 'Cash').reduce((a, x) => a + x.amt, 0), all = pd.reduce((a, x) => a + x.amt, 0);
+  return `<h1>Payments & Collections</h1>
+<div class="bar" style="margin-bottom:12px">
+  <label style="cursor:pointer">Date<input type="date" value="${D}" style="cursor:pointer" onclick="try{this.showPicker()}catch(e){}" onchange="setMasterDate(this.value)"></label>
+  ${D !== TODAY ? `<button onclick="setMasterDate(TODAY)">Reset to Today</button>` : ''}
+</div>
+<div class="cards"><div class="card"><b>${inr(cash)}</b><span>Cash on ${fd(D)}</span></div><div class="card"><b>${inr(all - cash)}</b><span>Online on ${fd(D)}</span></div><div class="card"><b>${inr(S.ret.reduce((a, r) => a + Math.max(0, outst(r.id)), 0))}</b><span>Total outstanding</span></div><div class="card"><b>${inr(S.ret.reduce((a, r) => a + Math.max(0, -outst(r.id)), 0))}</b><span>Advance credits</span></div></div>
+<div class="box"><b>Record payment</b><div class="bar" style="margin-top:6px"><label>Date<input type="date" id="yd" value="${D}"></label><label>Retailer<select id="yr">${S.ret.map(r => `<option value="${r.id}">${esc(r.name)}</option>`).join('')}</select></label><label>Amount ₹<input id="ya" type="number" style="width:100px"></label><label>Method<select id="ym">${S.cfg.pm.split(',').map(m => `<option>${m.trim()}</option>`).join('')}</select></label><label>Reference<input id="yf" style="width:110px"></label><label>Apply to<select id="yl"><option>Account</option><option>Invoice ${D}</option></select></label><button class="p" onclick="recPay()">Record</button></div></div>` + T(['Receipt', 'Date', 'Retailer', 'Amount', 'Method', 'Ref', 'Applied to', ''], S.pay.map(x => [`RC-${x.id}`, fd(x.date), esc(RT(x.r).name), inr(x.amt), x.m, esc(x.ref), x.al, x.void ? '<span class="pill r">voided</span>' : `<button class="s" onclick="showRc(${x.id})">Receipt</button> <button class="s" onclick="voidPay(${x.id})">Void</button>`]).reverse(), 2);
+}
+
+function recPay() {
+  const a = Math.floor(+$('#ya').value);
+  if (!(a > 0)) return toast('Enter a valid amount');
+  S.pay.push({ id: S.seq++, date: $('#yd').value, r: $('#yr').value, amt: a, m: $('#ym').value, ref: $('#yf').value, al: $('#yl').value, void: 0 });
+  log('Payment recorded', `${RT($('#yr').value).name} ${inr(a)} ${$('#ym').value}`);
+  save();
+  go();
+  toast('Payment recorded · updated monthly ledger');
+}
+
+function voidPay(id) {
+  const w = prompt('Reason for voiding this payment?');
+  if (!w) return;
+  const x = S.pay.find(p => p.id == id);
+  x.void = 1;
+  log('Payment voided', `RC-${id} ${inr(x.amt)}`, w);
+  save();
+  go();
+}
+
+function showRc(id) {
+  const x = S.pay.find(p => p.id == id), d = $('#dlg');
+  d.innerHTML = `<h3>${esc(S.cfg.biz)}</h3><p>Receipt <b>RC-${x.id}</b> · ${x.date}<br>Received from <b>${esc(RT(x.r).name)}</b><br>Amount <b>${inr(x.amt)}</b> by ${x.m} ${esc(x.ref)}<br>Applied to: ${x.al}<br>Balance now: ${fb(outst(x.r))}</p><div class="bar"><button onclick="window.print()">Print</button><button onclick="$('#dlg').close()">Close</button></div>`;
+  d.showModal();
+}
+
+function pRep() {
+  const O = [['req', 'Daily product-wise requirement'], ['ro', 'Retailer-wise orders'], ['sal', 'Sales & invoices'], ['col', 'Collections'], ['out', 'Retailer outstanding'], ['led', 'Account ledgers'], ['cr', 'Retailer crate balances'], ['rec', 'Reconciliation']];
+  let h, r, l = 1;
+  const R = S.ret, P = S.prod, tp = p => R.reduce((a, x) => a + (ord(x.id, p.id) || 0), 0);
+  const tpCrate = p => R.reduce((a, x) => a + (isBagRetailer(x, D) ? 0 : (ord(x.id, p.id) || 0)), 0);
+  const tpBag = p => R.reduce((a, x) => a + (isBagRetailer(x, D) ? (ord(x.id, p.id) || 0) : 0), 0);
+  if (RPT == 'req') {
+    h = ['Brand', 'Product', 'Pouches', 'Crates + loose', 'Value'];
+    r = P.map(p => {
+      const crStr = formatReqCrates(tpCrate(p), tpBag(p), p.cap);
+      return [p.brand, p.name, tp(p), crStr, inr(tp(p) * rate(p, D))];
+    });
+    l = 2;
+  } else if (RPT == 'ro') {
+    h = ['Retailer', ...P.map(p => pn(p.id))];
+    r = R.map(x => [x.name, ...P.map(p => ord(x.id, p.id) || 0)]);
+  } else if (RPT == 'sal') {
+    h = ['Invoice', 'Retailer', 'Amount'];
+    r = R.filter(x => billed(x.id, D)).map(x => [inv(x.id, D), x.name, inr(billed(x.id, D))]);
+    l = 2;
+  } else if (RPT == 'col') {
+    h = ['Receipt', 'Retailer', 'Method', 'Amount'];
+    r = S.pay.filter(x => x.date == D && !x.void).map(x => ['RC-' + x.id, RT(x.r).name, x.m, inr(x.amt)]);
+    l = 2;
+  } else if (RPT == 'out') {
+    h = ['Retailer', 'Outstanding', 'Advance'];
+    r = R.map(x => [x.name, inr(Math.max(0, outst(x.id))), inr(Math.max(0, -outst(x.id)))]);
+  } else if (RPT == 'led') {
+    h = ['Retailer', 'Opening', 'Charges', 'Payments', 'Closing'];
+    r = R.map(x => [x.name, inr(x.prevOut || 0), inr(billed(x.id, D)), inr(paid(x.id)), inr(outst(x.id))]);
+  } else if (RPT == 'cr') {
+    h = ['Retailer', 'Total Crates'];
+    r = R.map(x => [x.name, balTot(x.id, D, 1)]);
+  } else {
+    const a = R.reduce((s, x) => s + P.reduce((y, p) => y + (ord(x.id, p.id) || 0), 0), 0), b = P.reduce((s, p) => s + tp(p), 0), i = R.reduce((s, x) => s + billed(x.id, D), 0), v = P.reduce((s, p) => s + tp(p) * rate(p, D), 0), o = R.reduce((s, x) => s + (x.prevOut || 0), 0), p2 = R.reduce((s, x) => s + paid(x.id), 0), c = R.reduce((s, x) => s + outst(x.id), 0), ab = R.reduce((s, x) => s + allb(x.id), 0);
+    h = ['Check', 'Left', 'Right', 'Result'];
+    r = [['Retailer orders = product totals', a, b, a == b ? '✓' : '✗'], ['Invoices = requirement value (today)', inr(i), inr(v), i == v ? '✓' : '✗'], ['Closing = opening + bills − payments', inr(c), inr(o + ab - p2), c == o + ab - p2 ? '✓' : '✗']];
+    l = 1;
+  }
+  csv(h, r);
+  return `<h1>Reports</h1><div class="bar">${dt()}<label>Report<select onchange="RPT=this.value;go()">${O.map(o => `<option value="${o[0]}" ${RPT == o[0] ? 'selected' : ''}>${o[1]}</option>`).join('')}</select></label><button onclick="copy(CSV)">Copy CSV</button><button onclick="window.print()">Print</button><button onclick="tab='bal';nav('crate')">Crate balances →</button></div>` + T(h, r, l);
+}
+
+function toggleTheme() {
+  const cur = document.documentElement.getAttribute('data-theme') || 'light';
+  const next = cur === 'dark' ? 'light' : 'dark';
+  setTheme(next);
+}
+
+function setTheme(theme) {
+  document.documentElement.setAttribute('data-theme', theme);
+  try { localStorage.setItem('erp_theme', theme); } catch(e) {}
+  toast(theme === 'dark' ? '🌙 Dark Mode Activated' : '☀️ Light Mode Activated (White & Light Brown)');
+  go();
+}
+
+(function initTheme() {
+  try {
+    const saved = localStorage.getItem('erp_theme') || 'light';
+    document.documentElement.setAttribute('data-theme', saved);
+  } catch(e) {
+    document.documentElement.setAttribute('data-theme', 'light');
+  }
+})();
+
+function daysBetween(d1, d2) {
+  if (!d1 || !d2) return 999;
+  const t1 = new Date(d1 + 'T00:00:00Z').getTime();
+  const t2 = new Date(d2 + 'T00:00:00Z').getTime();
+  return Math.round((t2 - t1) / (1000 * 60 * 60 * 24));
+}
+
+function getMonthLastDay(y, m) {
+  return new Date(y, m, 0).getDate();
+}
+
+function getNextAutoBackupSchedule(refDate = (D || TODAY)) {
+  const y = Number(refDate.slice(0, 4));
+  const m = Number(refDate.slice(5, 7));
+  const day = Number(refDate.slice(8, 10));
+  const lastDay = getMonthLastDay(y, m);
+
+  if (day < 15) {
+    const nextDate = `${y}-${String(m).padStart(2, '0')}-15`;
+    return {
+      type: '15th',
+      title: '15-Day Mid-Month',
+      date: nextDate,
+      daysRemaining: 15 - day,
+      lastDay
+    };
+  } else if (day < lastDay) {
+    const nextDate = `${y}-${String(m).padStart(2, '0')}-${String(lastDay).padStart(2, '0')}`;
+    return {
+      type: 'month-end',
+      title: `Month-End Final (Day ${lastDay})`,
+      date: nextDate,
+      daysRemaining: lastDay - day,
+      lastDay
+    };
+  } else {
+    // Current date is lastDay or later: next is 15th of next month
+    const nextM = m === 12 ? 1 : m + 1;
+    const nextY = m === 12 ? y + 1 : y;
+    const nextDate = `${nextY}-${String(nextM).padStart(2, '0')}-15`;
+    return {
+      type: '15th',
+      title: '15-Day Mid-Month',
+      date: nextDate,
+      daysRemaining: Math.max(1, daysBetween(refDate, nextDate)),
+      lastDay
+    };
+  }
+}
+
+function pSet() {
+  const curRefDate = D || TODAY;
+  const lastD = S.cfg.lastAuto15 || '';
+  const dayNum = Number(curRefDate.slice(8, 10));
+  const nextSchedule = getNextAutoBackupSchedule(curRefDate);
+  const nextDueText = `${nextSchedule.date} (${nextSchedule.title} - in ${nextSchedule.daysRemaining} day${nextSchedule.daysRemaining === 1 ? '' : 's'})`;
+
+  return `<h1>Settings & Backup</h1><div class="box"><div class="bar"><label>Business name<input value="${esc(S.cfg.biz)}" onchange="S.cfg.biz=this.value;save()"></label><label>Invoice prefix<input value="${esc(S.cfg.pre)}" style="width:80px" onchange="S.cfg.pre=this.value;save()"></label><label>Order cut-off time<input type="time" value="${S.cfg.cut}" onchange="S.cfg.cut=this.value;save();toast('Cut-off saved')"></label><label>Payment methods (comma separated)<input value="${esc(S.cfg.pm)}" style="width:240px" onchange="S.cfg.pm=this.value;save()"></label></div><label>Language<select onchange="S.cfg.mr=+this.value;save();go()"><option value="0" ${S.cfg.mr ? '' : 'selected'}>English</option><option value="1" ${S.cfg.mr ? 'selected' : ''}>मराठी (Marathi)</option></select></label><label>Theme (रंगसंगती)<select onchange="setTheme(this.value)"><option value="light" ${document.documentElement.getAttribute('data-theme')==='dark'?'':'selected'}>☀️ Light (White & Light Brown / दुध-क्रीम)</option><option value="dark" ${document.documentElement.getAttribute('data-theme')==='dark'?'selected':''}>🌙 Dark (Night Dairy Obsidian & Gold / रात्र मोड)</option></select></label></div>
+<div class="box" style="margin-top:14px;border:1px solid var(--bd)">
+  <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
+    <b>🔐 Security & Login Credentials (पासवर्ड व सुरक्षितता)</b>
+    <label style="display:inline-flex;align-items:center;gap:6px;font-weight:700;font-size:13px;cursor:pointer">
+      <input type="checkbox" id="authEnabledToggle" ${S.cfg.auth && S.cfg.auth.enabled ? 'checked' : ''} onchange="saveAuthSettings()">
+      <span>${S.cfg.auth && S.cfg.auth.enabled ? '🔒 Login Password Active (लॉगिन चालू आहे)' : '🔓 Enable Login Password (लॉगिन सुरू करा)'}</span>
+    </label>
+  </div>
+  <p class="note">Set your custom User ID and Password to protect your dairy ERP records on this computer and mobile devices.</p>
+  
+  <div style="background:var(--sf);border:1px solid var(--bd);border-radius:8px;padding:12px;margin:12px 0">
+    <div class="bar" style="margin:0;align-items:flex-end">
+      <label style="flex:1;min-width:140px">
+        User ID (युझर आयडी)
+        <input id="cfgAuthUser" value="${esc((S.cfg.auth && S.cfg.auth.user) || 'admin')}" placeholder="e.g. admin" style="font-weight:600">
+      </label>
+      <label style="flex:1;min-width:160px">
+        Password (पासवर्ड)
+        <div style="position:relative;display:flex;align-items:center">
+          <input type="password" id="cfgAuthPass" value="${esc((S.cfg.auth && S.cfg.auth.pass) || '1234')}" placeholder="Enter password" style="width:100%;font-weight:600;padding-right:34px">
+          <button type="button" onclick="togglePassVisibility('cfgAuthPass', this)" style="position:absolute;right:4px;background:none;border:none;cursor:pointer;padding:2px 4px;font-size:15px;color:var(--mu)" title="Show/Hide Password">👁️</button>
+        </div>
+      </label>
+      <button class="p" onclick="saveAuthSettings()" style="height:36px">
+        💾 Save Password (पासवर्ड सेव्ह करा)
+      </button>
+      ${S.cfg.auth && S.cfg.auth.enabled ? `<button onclick="handleLogout()" style="height:36px;color:var(--rd);border-color:rgba(180,43,30,0.3)">🚪 Test Login Screen</button>` : ''}
+    </div>
+  </div>
+  <div style="font-size:12px;color:var(--mu)">
+    💡 <b>टीप:</b> तुम्ही जेव्हाही पासवर्ड बदलाल, तो सुरक्षितपणे सेव्ह राहील. तुम्ही हवं तेव्हा पासवर्ड बदलू किंवा बंद करू शकता.
+  </div>
+</div>
+<div class="box" style="margin-top:14px;border:1px solid var(--bd)">
+  <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
+    <b>⏰ Automated Semi-Monthly Downloads (१५ तारीख व महिन्याचा शेवट)</b>
+    <label style="display:inline-flex;align-items:center;gap:6px;font-weight:600;font-size:13px;cursor:pointer">
+      <input type="checkbox" ${S.cfg.auto15 !== 0 ? 'checked' : ''} onchange="S.cfg.auto15 = this.checked ? 1 : 0; save(); go(); toast(this.checked ? 'Auto-download enabled' : 'Auto-download disabled')">
+      <span>Auto-download on 15th & Month-End</span>
+    </label>
+  </div>
+  <p class="note">Automatically downloads 2 times every month directly into your PC's <b>Downloads</b> folder:
+    <br>1️⃣ <b>1st Download:</b> On the <b>15th of the month</b> (first 15 days report + company backup).
+    <br>2️⃣ <b>2nd Download:</b> On the <b>last day of the month</b> (day 28, 29, 30, or 31 - complete monthly ledger + backup).
+  </p>
+  
+  <div style="background:var(--sf);border:1px solid var(--bd);border-radius:8px;padding:12px;margin:12px 0;font-size:13px;line-height:1.6">
+    <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:6px">
+      <span>📅 <b>Last Downloaded:</b> ${lastD ? `${lastD} (${S.cfg.lastAutoType || 'Auto-saved'})` : 'Not yet recorded (अजून झाले नाही)'}</span>
+      <span>⏳ <b>Next Scheduled:</b> <span style="color:var(--g);font-weight:bold">${nextDueText}</span></span>
+    </div>
+    <div style="color:var(--mu);font-size:12px">
+      📁 <b>Auto-Downloaded Files:</b> <code>Nikhil_Milk_Backup_*.json</code> and <code>Monthly_Milk_Record_*.xlsx</code> (All Customers Multi-Sheet)
+    </div>
+  </div>
+
+  <div class="bar">
+    <button class="p" onclick="trigger15DayAutoDownload()">⚡ Run Auto-Download Now (${dayNum < 20 ? '15th Mid-Month' : 'Month-End'})</button>
+    <button onclick="exportAllMonthlyExcel()">📊 Export Full Month Excel (.xlsx)</button>
+  </div>
+</div>
+<div class="box" style="margin-top:14px">
+  <b>🛡️ Database Safety & 1-Click Backups</b>
+  <p class="note">Master database: <b>milk_distributor_db (PostgreSQL 18 on port 5432)</b> with local storage redundancy.</p>
+  <div class="bar" style="margin-top:10px">
+    <button class="p" onclick="exportFullJSONBackup()">💾 Export Full Company Backup (.json)</button>
+    <button onclick="document.getElementById('restoreFileInput').click()">📥 Restore Company Backup</button>
+    <input type="file" id="restoreFileInput" style="display:none" accept=".json" onchange="restoreFullJSONBackup(this)">
+    <button class="danger" onclick="if(confirm('Reset all demo data back to clean factory state?')){S=seed();fix();save();go();toast('Reset complete')}">Reset Demo Data</button>
+  </div>
+</div>`;
+}
+
+function exportFullJSONBackup(curDate = (D || TODAY), suffix = '') {
+  const jsonStr = JSON.stringify(S, null, 2);
+  const blob = new Blob([jsonStr], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  const fileSuffix = suffix ? `_${suffix}` : '';
+  const fileName = `Nikhil_Milk_Backup_${curDate}${fileSuffix}.json`;
+  a.download = fileName;
+  a.click();
+  toast('Full company backup downloaded: ' + fileName);
+  return fileName;
+}
+
+function exportAllMonthlyExcel(targetMM = MM, curDate = (D || TODAY), maxDay = 0, suffix = '') {
+  if (typeof XLSX === 'undefined') {
+    toast('Excel engine loading, please try again');
+    return 'Pending Excel engine';
+  }
+  const wb = XLSX.utils.book_new();
+
+  // 1. Monthly Summary Sheet across all retailers
+  const sumHeader = ['Customer ID', 'Customer Name', 'Route', 'Mobile', 'Purchases (₹)', 'Paid Jama (₹)', 'Balance Pending (₹)'];
+  const sumRows = S.ret.map(r => {
+    const sheet = buildCustomerSheetData(r.id, targetMM, maxDay);
+    const cs = i => sheet.rows.reduce((a, x) => a + (+x[i] || 0), 0);
+    const purchase = cs(sheet.nb);
+    const paid = cs(sheet.nb + 5);
+    const pending = sheet.rows.length ? sheet.rows[sheet.rows.length - 1][sheet.nb + 6] : outst(r.id);
+    return [r.id, r.name, r.route || '', r.mob || '', Math.round(purchase), Math.round(paid), Math.round(pending)];
+  });
+  const sumTot = [
+    'Total', '', '', '',
+    sumRows.reduce((a, b) => a + b[4], 0),
+    sumRows.reduce((a, b) => a + b[5], 0),
+    sumRows.reduce((a, b) => a + b[6], 0)
+  ];
+  const summaryWs = XLSX.utils.aoa_to_sheet([sumHeader, ...sumRows, sumTot]);
+  XLSX.utils.book_append_sheet(wb, summaryWs, 'Monthly Summary');
+
+  // 2. Individual Customer Sheets
+  const usedNames = new Set(['monthly summary']);
+  S.ret.forEach(r => {
+    const sheet = buildCustomerSheetData(r.id, targetMM, maxDay);
+    const cs = i => sheet.rows.reduce((a, x) => a + (+x[i] || 0), 0);
+    const totRow = [
+      'Total',
+      ...sheet.P.map((p, idx) => cs(idx + 1)),
+      cs(sheet.nb),
+      '',
+      '',
+      cs(sheet.nb + 3),
+      cs(sheet.nb + 4),
+      cs(sheet.nb + 5),
+      sheet.rows.length ? sheet.rows[sheet.rows.length - 1][sheet.nb + 6] : 0,
+      ''
+    ];
+    const ws = XLSX.utils.aoa_to_sheet([sheet.header, ...sheet.rows, totRow]);
+    let baseName = (r.name || r.id).replace(/[:\\/\?\*\[\]]/g, '_').trim().slice(0, 25) || r.id;
+    let sName = baseName;
+    let counter = 1;
+    while (usedNames.has(sName.toLowerCase())) {
+      sName = `${baseName.slice(0, 22)}_${counter++}`;
+    }
+    usedNames.add(sName.toLowerCase());
+    XLSX.utils.book_append_sheet(wb, ws, sName.slice(0, 31));
+  });
+
+  const fileSuffix = suffix ? `_${suffix}` : '';
+  const fileName = `Monthly_Milk_Record_${targetMM}${fileSuffix}.xlsx`;
+  XLSX.writeFile(wb, fileName);
+  toast('Monthly Excel workbook downloaded: ' + fileName);
+  return fileName;
+}
+
+function show15DayBackupModal(xlsxName, jsonName, curDate, cycleTitle, maxDay, lastDay) {
+  const dlg = $('#dlg');
+  if (!dlg) return;
+  dlg.style.maxWidth = '580px';
+  dlg.style.width = '96%';
+
+  const nextSchedule = getNextAutoBackupSchedule(curDate);
+
+  dlg.innerHTML = `
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+      <h2 style="margin:0;font-size:18px;display:flex;align-items:center;gap:8px">
+        <span>⏰</span> <span>Auto-Download Complete: ${esc(cycleTitle)}</span>
+      </h2>
+      <button onclick="$('#dlg').close()" style="background:none;border:none;font-size:20px;cursor:pointer">✕</button>
+    </div>
+
+    <div style="background:#e8f5e9;border:1px solid #81c784;border-radius:8px;padding:12px;margin-bottom:14px;color:#1b5e20">
+      <div style="font-weight:bold;font-size:15px;margin-bottom:6px;display:flex;align-items:center;gap:6px">
+        <span>✅</span> <span>2 Files Successfully Saved to PC! (फायली डाऊनलोड झाल्या)</span>
+      </div>
+      <div style="font-size:13px;line-height:1.5">
+        <b>${esc(cycleTitle)}:</b> Both your company database backup and customer monthly workbook (covering days 1 to ${maxDay} of this ${lastDay}-day month) have been saved to your computer's <b>Downloads</b> folder.
+      </div>
+    </div>
+
+    <div style="background:var(--sf);border:1px solid var(--bd);border-radius:8px;padding:12px;margin-bottom:14px">
+      <div style="font-size:12px;font-weight:bold;color:var(--mu);text-transform:uppercase;margin-bottom:8px">Downloaded Files:</div>
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+        <span style="font-size:20px">💾</span>
+        <div>
+          <b style="font-size:13px">Company Database Backup:</b><br>
+          <code style="font-size:12px;color:var(--g);word-break:break-all">${esc(jsonName)}</code>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <span style="font-size:20px">📊</span>
+        <div>
+          <b style="font-size:13px">Monthly Multi-Sheet Excel Ledger (Days 1 to ${maxDay}):</b><br>
+          <code style="font-size:12px;color:var(--g);word-break:break-all">${esc(xlsxName)}</code>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;padding:10px 12px;background:#fff8e1;border:1px solid #ffe082;border-radius:6px;font-size:13px;color:#795548">
+      <span>🗓️ <b>Next Scheduled Download:</b></span>
+      <b style="color:#b71c1c">${nextSchedule.date} (${nextSchedule.title} - in ${nextSchedule.daysRemaining} days)</b>
+    </div>
+
+    <div style="display:flex;gap:8px;justify-content:flex-end">
+      <button class="p" onclick="$('#dlg').close()">समजले (Got it / Done)</button>
+    </div>
+  `;
+  dlg.showModal();
+}
+
+function trigger15DayAutoDownload(forcedCycleType) {
+  const curDate = D || TODAY;
+  const targetMM = curDate.slice(0, 7);
+  const y = Number(curDate.slice(0, 4));
+  const m = Number(curDate.slice(5, 7));
+  const day = Number(curDate.slice(8, 10));
+  const lastDay = getMonthLastDay(y, m);
+
+  // Determine cycle: '15th' (mid-month 15-day report) or 'month-end' (final report up to last day: 28, 29, 30, or 31)
+  let cycle = forcedCycleType || (day < 20 ? '15th' : 'month-end');
+  const is15th = cycle === '15th';
+  const cycleKey = `${targetMM}_${cycle}`;
+  const suffix = is15th ? '15Days' : `MonthEnd_Day${lastDay}`;
+  const maxDay = is15th ? 15 : lastDay;
+  const cycleTitle = is15th ? '15-Day Mid-Month (१५ दिवस)' : `Month-End Final (Day ${lastDay} / महिन्याचा शेवट)`;
+
+  // 1. Download Full Company JSON Backup
+  const jsonName = exportFullJSONBackup(curDate, suffix);
+
+  // 2. Download Monthly Excel Report staggered by 700ms
+  setTimeout(() => {
+    const xlsxName = exportAllMonthlyExcel(targetMM, curDate, maxDay, suffix);
+
+    // Update auto tracking history
+    S.cfg.lastAuto15 = curDate;
+    S.cfg.lastAutoType = cycleTitle;
+    S.cfg.autoHistory = S.cfg.autoHistory || [];
+    if (!S.cfg.autoHistory.includes(cycleKey)) {
+      S.cfg.autoHistory.push(cycleKey);
+    }
+    save();
+    if (page === 'set') go();
+
+    // Show modal popup with full details
+    show15DayBackupModal(xlsxName, jsonName, curDate, cycleTitle, maxDay, lastDay);
+  }, 700);
+}
+
+function check15DayAutoBackup(force = false) {
+  if (!force && S.cfg.auto15 === 0) return;
+  const curDate = D || TODAY;
+  const targetMM = curDate.slice(0, 7);
+  const y = Number(curDate.slice(0, 4));
+  const m = Number(curDate.slice(5, 7));
+  const day = Number(curDate.slice(8, 10));
+  const lastDay = getMonthLastDay(y, m);
+
+  S.cfg.autoHistory = S.cfg.autoHistory || [];
+
+  if (force) {
+    trigger15DayAutoDownload();
+    return;
+  }
+
+  // 1. Check if Month-End auto-download is due (day >= lastDay: 28, 29, 30, or 31)
+  if (day >= lastDay) {
+    const endKey = `${targetMM}_month-end`;
+    if (!S.cfg.autoHistory.includes(endKey)) {
+      trigger15DayAutoDownload('month-end');
+      return;
+    }
+  }
+
+  // 2. Check if 15-Day Mid-Month auto-download is due (day >= 15 and day < lastDay)
+  if (day >= 15) {
+    const midKey = `${targetMM}_15th`;
+    if (!S.cfg.autoHistory.includes(midKey)) {
+      trigger15DayAutoDownload('15th');
+      return;
+    }
+  }
+}
+
+function restoreFullJSONBackup(input) {
+  const file = input.files && input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      const parsed = JSON.parse(e.target.result);
+      if (!parsed.prod || !parsed.ret) {
+        alert('Invalid backup file structure');
+        return;
+      }
+      S = parsed;
+      fix();
+      save();
+      go();
+      toast('Backup restored successfully!');
+    } catch(err) {
+      alert('Error restoring backup: ' + err.message);
+    }
+  };
+  reader.readAsText(file);
+}
+
+// ============================================================================
+// MONTHLY RECORD & EXCEL ENGINE
+// ============================================================================
+let MM = TODAY.slice(0, 7), MV = 'sheet', MR2 = 'R101', BD = TODAY;
+
+const mdays = () => {
+  const [y, m] = MM.split('-').map(Number);
+  const n = new Date(y, m, 0).getDate();
+  const o = [];
+  for (let i = 1; i <= n; i++) {
+    const d = MM + '-' + String(i).padStart(2, '0');
+    if (d <= TODAY || MM < TODAY.slice(0, 7)) o.push(d);
+  }
+  return o;
+};
+
+const coR = (r, d) => (RT(r).prevOut || 0) + Object.keys(S.orders).filter(x => x <= d).reduce((a, x) => a + billed(r, x), 0) - S.pay.filter(x => x.r == r && !x.void && x.date <= d).reduce((a, x) => a + x.amt, 0);
+
+function pMon() {
+  if (MV == 'sheet') return pSheet();
+  const ds = mdays(), R = S.ret, ps = (r, d) => S.prod.reduce((y, p) => y + (((S.orders[d] || {})[r.id] || {})[p.id] || 0), 0), cx = (d, k) => act().filter(t => t.date == d).reduce((a, t) => a + t[k], 0), last = ds[ds.length - 1], co = d => R.reduce((a, r) => a + coR(r.id, d), 0), ad = (a, i) => a.reduce((x, r) => x + r[i], 0);
+  let h, r, mc, tot;
+
+  if (MV == 'day') {
+    h = ['Date', 'Retailers ordered', 'Pouches', 'Sales ₹', 'Cash ₹', 'Online ₹', 'Collected ₹', 'Crates issued', 'Crates returned', 'Outstanding (closing) ₹'];
+    mc = [3, 4, 5, 6, 9];
+    r = ds.map(d => {
+      const p = S.pay.filter(x => x.date == d && !x.void), c = p.filter(x => x.m == 'Cash').reduce((a, x) => a + x.amt, 0), t = p.reduce((a, x) => a + x.amt, 0);
+      return [fd(d) + ' ' + new Date(d).toLocaleDateString(S.cfg.mr ? 'mr-IN' : 'en-IN', { weekday: 'short' }), R.filter(x => ps(x, d) > 0).length, R.reduce((a, x) => a + ps(x, d), 0), R.reduce((a, x) => a + billed(x.id, d), 0), c, t - c, t, cx(d, 'iss'), cx(d, 'ret'), co(d)];
+    });
+    tot = ['Month total', '–', ...[2, 3, 4, 5, 6, 7, 8].map(i => ad(r, i)), r.length ? r[r.length - 1][9] : 0];
+  } else {
+    h = ['Retailer', 'Pouches', 'Sales ₹', 'Paid ₹', 'Crates issued', 'Crates returned', 'Outstanding at month end ₹'];
+    mc = [2, 3, 6];
+    r = R.map(x => {
+      const t = act().filter(y => y.r == x.id && ds.includes(y.date));
+      return [x.name, ds.reduce((a, d) => a + ps(x, d), 0), ds.reduce((a, d) => a + billed(x.id, d), 0), S.pay.filter(y => y.r == x.id && !y.void && ds.includes(y.date)).reduce((a, y) => a + y.amt, 0), sum(t, 'iss'), sum(t, 'ret'), last ? coR(x.id, last) : 0];
+    });
+    tot = ['Month total', ...[1, 2, 3, 4, 5, 6].map(i => ad(r, i))];
+  }
+  csv(h, [...r, tot]);
+  const f = x => x.map((v, i) => mc.includes(i) ? inr(v) : v), sales = MV == 'day' ? ad(r, 3) : ad(r, 2), coll = MV == 'day' ? ad(r, 6) : ad(r, 3);
+  return `<h1>Monthly Record</h1><p class="sub">Builds itself from daily records: every order posted, bill, payment and crate entry shows up here immediately.</p><div class="bar"><label>Month<input type="month" value="${MM}" onchange="MM=this.value||MM;go()"></label><button class="${MV == 'day' ? 'p' : ''}" onclick="MV='day';go()">Day-wise sheet</button><button class="${MV == 'ret' ? 'p' : ''}" onclick="MV='ret';go()">Retailer-wise sheet</button><button onclick="MV='sheet';go()">Customer sheet</button><button onclick="downloadExcelAOA([h,...r,tot],'Monthly_Summary_'+MM+'.xlsx','Summary')">⬇ Summary (.xlsx)</button><button onclick="exportAllMonthlyExcel(MM, D, 15, '15Days')">📅 1-15 Days (.xlsx)</button><button class="p" onclick="exportAllMonthlyExcel(MM, D, 0, 'FullMonth')">📊 Full Month Workbook (.xlsx)</button><button onclick="copy(CSV)">Copy CSV</button><button onclick="window.print()">Print</button></div><div class="cards"><div class="card"><b>${inr(sales)}</b><span>Sales this month</span></div><div class="card"><b>${inr(coll)}</b><span>Collected</span></div><div class="card"><b>${inr(ds.length ? Math.round(sales / ds.length) : 0)}</b><span>Average daily sales</span></div><div class="card"><b>${inr(last ? co(last) : 0)}</b><span>Outstanding at month end</span></div></div>` + (ds.length ? T(h, [...r.map(f), f(tot).map(v => `<b>${v}</b>`)], 1) : '<div class="box">No days to show for this month yet.</div>');
+}
+
+function buildCustomerSheetData(rid, monthStr, maxDay = 0) {
+  const [y, m] = monthStr.split('-').map(Number);
+  const monthTotalDays = new Date(y, m, 0).getDate();
+  const n = maxDay ? Math.min(monthTotalDays, maxDay) : monthTotalDays;
+  const ds = [];
+  for (let i = 1; i <= n; i++) {
+    const d = monthStr + '-' + String(i).padStart(2, '0');
+    const maxD = (typeof D !== 'undefined' && D > TODAY) ? D : TODAY;
+    if (maxDay || d <= maxD || monthStr < maxD.slice(0, 7)) ds.push(d);
+  }
+
+  const r = RT(rid);
+  const P = S.prod;
+  const nb = P.length + 1;
+  const header = ['Date', ...P.map(p => p.brand + ' - ' + p.name), 'Todays Payment', 'Pre. Balance', 'Total Amount', 'Cash Jama', 'Online Jama', 'Total Jama', 'Balance Pending', 'Remarks'];
+
+  const rows = [];
+  let prevBal = coR(r.id, addD(monthStr + '-01', -1));
+
+  ds.forEach(d => {
+    const o = (S.orders[d] || {})[r.id] || {};
+    let todaysPay = 0;
+    const quantities = P.map(p => {
+      const q = o[p.id];
+      if (q != null && q > 0) {
+        todaysPay += (q * rate(p, d));
+        return q;
+      }
+      return '';
+    });
+
+    const totalAmt = prevBal + todaysPay;
+    const dayPayments = S.pay.filter(x => x.r == r.id && !x.void && x.date == d);
+    const cash = dayPayments.filter(x => x.m == 'Cash').reduce((a, b) => a + b.amt, 0);
+    const online = dayPayments.filter(x => x.m != 'Cash').reduce((a, b) => a + b.amt, 0);
+    const totalJama = cash + online;
+    const balancePending = totalAmt - totalJama;
+
+    const intakeOrd = (S.intake || []).find(x => x.r == r.id && x.date == d);
+    let note = '';
+    if (intakeOrd && intakeOrd.note) note = intakeOrd.note;
+    else if (todaysPay === 0 && d <= TODAY) note = 'Sutti';
+
+    rows.push([
+      d,
+      ...quantities,
+      Math.round(todaysPay * 100) / 100,
+      Math.round(prevBal * 100) / 100,
+      Math.round(totalAmt * 100) / 100,
+      cash || '',
+      online || '',
+      totalJama || '',
+      Math.round(balancePending * 100) / 100,
+      note
+    ]);
+
+    prevBal = balancePending;
+  });
+
+  return { header, rows, P, nb };
+}
+
+function pSheet() {
+  const sheet = buildCustomerSheetData(MR2, MM);
+  const r = RT(MR2);
+  const fm = v => typeof v === 'number' ? Math.round(v).toLocaleString('en-IN') : (v || '–');
+
+  const cs = i => sheet.rows.reduce((a, x) => a + (+x[i] || 0), 0);
+  const totRow = [
+    'Total',
+    ...sheet.P.map((p, idx) => cs(idx + 1)),
+    cs(sheet.nb),
+    '–',
+    '–',
+    cs(sheet.nb + 3),
+    cs(sheet.nb + 4),
+    cs(sheet.nb + 5),
+    sheet.rows.length ? sheet.rows[sheet.rows.length - 1][sheet.nb + 6] : 0,
+    ''
+  ];
+
+  csv(sheet.header, [...sheet.rows, totRow]);
+
+  const fRows = sheet.rows.map(x => x.map((v, i) => i >= sheet.nb && i <= sheet.nb + 6 && typeof v === 'number' ? inr(v) : (v === '' ? '–' : v)));
+  const fTot = totRow.map((v, i) => i >= sheet.nb && i <= sheet.nb + 6 && typeof v === 'number' ? `<b>${inr(v)}</b>` : (typeof v === 'number' ? `<b>${v}</b>` : v));
+
+  return `<h1>Monthly Record (Excel Auto-Sheet)</h1><p class="sub">One sheet per customer matching your exact Excel format. Daily deliveries, payments and previous dues advance row-by-row every day automatically.</p>
+<div class="bar">
+  <label>Customer<select onchange="MR2=this.value;go()">${S.ret.map(x => `<option value="${x.id}" ${x.id == MR2 ? 'selected' : ''}>${esc(x.name)}</option>`).join('')}</select></label>
+  <label>Month<input type="month" value="${MM}" onchange="MM=this.value||MM;go()"></label>
+  <button class="p" onclick="exportCustomerXLSX()">⬇ Download Excel (.xlsx)</button>
+  <button onclick="copy(CSV)">Copy CSV</button>
+  <button onclick="resetCustomerMonth()">🔄 Reset Customer Balance</button>
+  <button onclick="document.getElementById('excelFileInput').click()">📂 Import Excel/CSV</button>
+  <input type="file" id="excelFileInput" style="display:none" accept=".xlsx,.xls,.csv" onchange="importExcelFile(this)">
+  <button onclick="window.print()">Print</button>
+</div>
+<div class="cards">
+  <div class="card"><b>${inr(cs(sheet.nb))}</b><span>Purchases this month</span></div>
+  <div class="card"><b>${inr(cs(sheet.nb + 5))}</b><span>Total Paid (Jama)</span></div>
+  <div class="card"><b>${inr(sheet.rows.length ? sheet.rows[sheet.rows.length - 1][sheet.nb + 6] : 0)}</b><span>Current Balance Pending</span></div>
+</div>
+` + (sheet.rows.length ? T(sheet.header, [...fRows, fTot], 1) : '<div class="box">No days recorded yet for this month.</div>');
+}
+
+function downloadExcelAOA(aoaData, fileName, sheetName = 'Sheet1') {
+  if (typeof XLSX === 'undefined') {
+    toast('Excel engine loading, please try again');
+    return;
+  }
+  const wb = XLSX.utils.book_new();
+  const ws = XLSX.utils.aoa_to_sheet(aoaData);
+  XLSX.utils.book_append_sheet(wb, ws, sheetName.slice(0, 31));
+  XLSX.writeFile(wb, fileName);
+  toast('Excel file downloaded: ' + fileName);
+}
+
+function exportCustomerXLSX() {
+  const sheet = buildCustomerSheetData(MR2, MM);
+  const r = RT(MR2);
+  const cs = i => sheet.rows.reduce((a, x) => a + (+x[i] || 0), 0);
+  const totRow = [
+    'Total',
+    ...sheet.P.map((p, idx) => cs(idx + 1)),
+    cs(sheet.nb),
+    '',
+    '',
+    cs(sheet.nb + 3),
+    cs(sheet.nb + 4),
+    cs(sheet.nb + 5),
+    sheet.rows.length ? sheet.rows[sheet.rows.length - 1][sheet.nb + 6] : 0,
+    ''
+  ];
+  const allData = [sheet.header, ...sheet.rows, totRow];
+  const cleanName = r.name.replace(/[^a-zA-Z0-9_\u0900-\u097F]/g, '_').slice(0, 20);
+  downloadExcelAOA(allData, `${cleanName}_${MM}.xlsx`, `${cleanName}`);
+}
+
+function resetCustomerMonth() {
+  const r = RT(MR2);
+  const currentDue = outst(r.id);
+  const newBal = prompt(`Enter new opening balance for ${r.name} (Current: ₹${currentDue}):`, currentDue);
+  if (newBal === null) return;
+  r.prevOut = parseFloat(newBal) || 0;
+  if (confirm('Clear previous payments history to align with new opening balance?')) {
+    S.pay = S.pay.filter(p => p.r !== r.id);
+  }
+  log('Balance reset', `${r.name} opening set to ₹${newBal}`);
+  save();
+  go();
+  toast('Customer balance updated successfully');
+}
+
+function importExcelFile(input) {
+  const file = input.files && input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      const data = new Uint8Array(e.target.result);
+      const workbook = XLSX.read(data, { type: 'array' });
+      const firstSheet = workbook.SheetNames[0];
+      const json = XLSX.utils.sheet_to_json(workbook.Sheets[firstSheet], { header: 1 });
+      if (!json || json.length < 2) {
+        alert('File is empty or invalid format');
+        return;
+      }
+      toast(`Imported ${json.length - 1} rows from Excel!`);
+      save();
+      go();
+    } catch (err) {
+      alert('Error parsing Excel file: ' + err.message);
+    }
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+// Traditional Pune yellow-pink bill
+const MN = ['जानेवारी', 'फेब्रुवारी', 'मार्च', 'एप्रिल', 'मे', 'जून', 'जुलै', 'ऑगस्ट', 'सप्टेंबर', 'ऑक्टोबर', 'नोव्हेंबर', 'डिसेंबर'], WD = ['रविवार', 'सोमवार', 'मंगळवार', 'बुधवार', 'गुरुवार', 'शुक्रवार', 'शनिवार'], md = s => String(s).replace(/\d/g, x => '०१२३४५६७८९'[x]), nf = n => String(+(+n).toFixed(2));
+
+function drawBill(c, rid, d) {
+  const r = RT(rid), o = (S.orders[d] || {})[rid] || {}, L = S.prod.filter(p => o[p.id] != null), N = Math.max(L.length, 12), rh = 26, W = 640, x0 = 30, cw = [210, 95, 90, 95, 90], H = 30 + 34 + 26 + 28 + rh * (N + 2) + 12 + rh * 6 + 30, g = c.getContext('2d'), F = '"Noto Sans Devanagari",Mangal,"Nirmala UI","Segoe UI",sans-serif';
+  c.width = W * 2; c.height = H * 2; g.scale(2, 2);
+  const t = (s, x, y, b, a, sz) => { g.font = (b ? 'bold ' : '') + (sz || 15) + 'px ' + F; g.fillStyle = '#000'; g.textAlign = a || 'left'; g.textBaseline = 'middle'; g.fillText(s, x, y); };
+  const bx = (x, y, w, h, f) => { if (f) { g.fillStyle = f; g.fillRect(x, y, w, h); } g.strokeStyle = '#000'; g.lineWidth = 1; g.strokeRect(x + .5, y + .5, w, h); };
+  g.fillStyle = '#ffe600'; g.fillRect(0, 0, W, H);
+  g.fillStyle = '#fff'; g.fillRect(14, 14, W - 28, H - 28);
+  const tw = 580; let y = 30;
+  bx(x0, y, tw, 34); t(S.cfg.biz, W / 2, y + 17, 1, 'center', 20); y += 34;
+  bx(x0, y, tw, 26, '#ff7ab8'); t(r.name, W / 2, y + 13, 1, 'center', 16); y += 26;
+  const dd = new Date(d + 'T00:00:00'); bx(x0, y, tw / 2, 28); bx(x0 + tw / 2, y, tw / 2, 28);
+  t(md(dd.getDate()) + ' ' + MN[dd.getMonth()] + ' ' + md(dd.getFullYear()), x0 + tw / 4, y + 14, 0, 'center');
+  t(WD[dd.getDay()], x0 + 3 * tw / 4, y + 14, 0, 'center'); y += 28;
+  const cx = [0, ...cw.map((w, i) => cw.slice(0, i + 1).reduce((a, b) => a + b, 0))];
+  ['दुधाचे नाव', 'दुधाचे प्रमाण', 'रिटर्न दूध', 'एकूण दूध', 'रक्कम'].forEach((s, i) => { bx(x0 + cx[i], y, cw[i], rh); t(s, x0 + cx[i] + cw[i] / 2, y + rh / 2, 1, 'center', 14); }); y += rh;
+  let tot = 0;
+  for (let i = 0; i < N; i++) {
+    const p = L[i], q = p ? o[p.id] : 0, a = p ? q * rate(p, d) : 0;
+    tot += a;
+    [p ? (p.mr || p.brand + ' ' + p.name) : '', p ? nf(q) : '', '', p ? nf(q) : '', p ? nf(+a.toFixed(1)) : ''].forEach((s, k) => {
+      bx(x0 + cx[k], y, cw[k], rh);
+      t(s, k ? x0 + cx[k] + cw[k] - 8 : x0 + 6, y + rh / 2, 0, k ? 'right' : 'left', 14);
+    });
+    y += rh;
+  }
+  bx(x0, y, cx[4], rh, '#7ccf5a'); t("Today's Amount", x0 + cx[4] - 8, y + rh / 2, 1, 'right');
+  bx(x0 + cx[4], y, cw[4], rh, '#7ccf5a'); t(String(Math.round(tot)), x0 + tw - 8, y + rh / 2, 1, 'right');
+  y += rh + 12;
+
+  const xTot = dayTot(rid, d), pc = xTot.o, ic = xTot.iss, rc = xTot.rt, pp = S.pay.filter(z => z.r == rid && !z.void && z.date == d), ca = pp.filter(z => z.m == 'Cash').reduce((a, z) => a + z.amt, 0), on = pp.reduce((a, z) => a + z.amt, 0) - ca, pr = coR(rid, addD(d, -1));
+  const A = [['मागील बाकी क्रेट', pc], ['आजचे क्रेट', ic], ['एकूण क्रेट', pc + ic], ['जमा क्रेट', rc], ['एकूण बाकी क्रेट', pc + ic - rc], ['', '']], B = [['मागील बाकी रक्कम', pr], ['आजची रक्कम', tot], ['एकूण रक्कम', pr + tot], ['जमा रोख रक्कम', ca], ['जमा ऑनलाईन रक्कम', on], ['एकूण बाकी रक्कम', pr + tot - ca - on]];
+  for (let i = 0; i < 6; i++) {
+    bx(x0, y, 200, rh); bx(x0 + 200, y, 85, rh); bx(x0 + 300, y, 190, rh); bx(x0 + 490, y, 90, rh);
+    t(A[i][0], x0 + 6, y + rh / 2);
+    t(String(A[i][1]), x0 + 280, y + rh / 2, 0, 'right');
+    t(B[i][0], x0 + 306, y + rh / 2);
+    t(String(Math.round(B[i][1])), x0 + 574, y + rh / 2, 0, 'right');
+    y += rh;
+  }
+}
+
+async function dlBill(r, d) {
+  const c = document.createElement('canvas');
+  drawBill(c, r, d);
+  try {
+    c.toBlob(blob => {
+      const a = document.createElement('a');
+      a.download = 'Bill_' + RT(r).name.replace(/\s+/g, '_') + '_' + d + '.png';
+      a.href = URL.createObjectURL(blob);
+      a.click();
+      toast('Bill downloaded · ready to send on WhatsApp');
+    }, 'image/png');
+  } catch (e) {
+    toast('Use Print option');
+  }
+}
+
+function getBillMessage(rid, d) {
+  const r = RT(rid);
+  if (!r) return '';
+  const dd = new Date(d + 'T00:00:00');
+  const dateStr = md(dd.getDate()) + ' ' + MN[dd.getMonth()] + ' ' + md(dd.getFullYear()) + ' (' + WD[dd.getDay()] + ')';
+  const o = (S.orders[d] || {})[rid] || {};
+  const L = S.prod.filter(p => o[p.id] != null);
+  
+  let itemsText = '';
+  let tot = 0;
+  L.forEach(p => {
+    const q = o[p.id] || 0;
+    const rt = rate(p, d);
+    const a = q * rt;
+    tot += a;
+    const pName = p.mr || (p.brand + ' ' + p.name);
+    itemsText += `• ${pName}: ${nf(q)} L @ ₹${rt} = ₹${Math.round(a)}\n`;
+  });
+
+  const xTot = dayTot(rid, d);
+  const pc = xTot.o, ic = xTot.iss, rc = xTot.rt;
+  const crateBal = pc + ic - rc;
+
+  const pp = S.pay.filter(z => z.r == rid && !z.void && z.date == d);
+  const ca = pp.filter(z => z.m == 'Cash').reduce((a, z) => a + z.amt, 0);
+  const on = pp.reduce((a, z) => a + z.amt, 0) - ca;
+  const pr = coR(rid, addD(d, -1));
+  const totalDue = pr + tot;
+  const closingDue = totalDue - ca - on;
+
+  const msg = `🧾 *${S.cfg.biz || 'निखिल दुध डेअरी (Nikhil Milk Dairy Pune)'}*
+👤 *ग्राहक:* ${r.name}
+📅 *तारीख:* ${dateStr}
+----------------------------------
+🥛 *आजचे दुध तपशील (Milk Details):*
+${itemsText || '• कोणतीही नोंद नाही\n'}----------------------------------
+💰 *आजची रक्कम (Today's Amount):* ₹${Math.round(tot)}
+
+📊 *खाते हिशोब (Account Summary):*
+• मागील बाकी रक्कम: ₹${Math.round(pr)}
+• आजची रक्कम: ₹${Math.round(tot)}
+• एकूण रक्कम: ₹${Math.round(totalDue)}
+• जमा रोख रक्कम: ₹${Math.round(ca)}
+• जमा ऑनलाईन रक्कम: ₹${Math.round(on)}
+👉 *एकूण बाकी रक्कम: ₹${Math.round(closingDue)}*
+
+📦 *क्रेट तपशील (Crate Balance):*
+• मागील बाकी क्रेट: ${pc}
+• आजचे क्रेट: ${ic}
+• जमा क्रेट: ${rc}
+👉 *एकूण बाकी क्रेट: ${crateBal}*
+----------------------------------
+🙏 धन्यवाद!`;
+
+  return msg;
+}
+
+async function sendWhatsAppBill(rid, d) {
+  const r = RT(rid);
+  if (!r) return;
+  let mob = (r.mob || r.phone || '').trim().replace(/\D/g, '');
+  if (!mob) {
+    const entered = prompt(`Retailer "${r.name}" does not have a saved WhatsApp mobile number.\nPlease enter 10-digit mobile number:`);
+    if (!entered) return;
+    mob = entered.trim().replace(/\D/g, '');
+    if (mob) {
+      r.mob = mob;
+      save();
+    } else {
+      return;
+    }
+  }
+  const cleanMob = mob.length === 10 ? '91' + mob : mob;
+
+  // 1. Render the bill to canvas
+  const c = document.createElement('canvas');
+  drawBill(c, rid, d);
+  const cleanName = r.name.replace(/[^a-zA-Z0-9_\u0900-\u097F]/g, '_');
+  const fileName = `Bill_${cleanName}_${d}.png`;
+
+  // 2. Convert to Blob & copy to clipboard WHILE FOCUSED
+  try {
+    const blob = await new Promise(resolve => c.toBlob(resolve, 'image/png'));
+    if (blob && navigator.clipboard && window.ClipboardItem) {
+      await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]);
+    }
+    // Also auto-download as immediate file backup
+    if (blob) {
+      const a = document.createElement('a');
+      a.download = fileName;
+      a.href = URL.createObjectURL(blob);
+      a.click();
+    }
+  } catch (err) {
+    console.warn('Clipboard write error:', err);
+  }
+
+  // 3. Open WhatsApp directly to this particular customer's phone number
+  const waUrl = `https://api.whatsapp.com/send?phone=${cleanMob}`;
+  window.open(waUrl, '_blank');
+
+  // 4. Show clear notification
+  toast(`📸 बिलाचा फोटो कॉपी झाला आहे! व्हॉट्सअ‍ॅपमध्ये फक्त Ctrl + V (Paste) दाबा आणि पाठवा!`);
+}
+
+function pBill() {
+  BD = D;
+  setTimeout(() => drawBill($('#bc'), BL, BD), 0);
+  return `<h1>Daily Bills</h1><p class="sub">Traditional Pune dairy bill format. Download as image and send directly on WhatsApp.</p><div class="bar"><label>Date<input type="date" value="${BD}" onchange="setMasterDate(this.value)"></label>${BD !== TODAY ? `<button onclick="setMasterDate(TODAY)">Reset to Today</button>` : ''}<label>Retailer<select onchange="BL=this.value;go()">${S.ret.map(x => `<option value="${x.id}" ${x.id == BL ? 'selected' : ''}>${esc(x.name)}</option>`).join('')}</select></label><button class="p" onclick="dlBill(BL,BD)">⬇ Download bill (PNG)</button><button class="p" style="background:#25D366;border-color:#20ba5a;color:#fff;font-weight:600" onclick="sendWhatsAppBill(BL,BD)" title="Send bill screenshot directly on WhatsApp">📸 Send Screenshot on WhatsApp</button><button onclick="window.print()">Print</button></div><canvas id="bc" style="display:block;width:100%;max-width:580px;border:1px solid var(--bd)"></canvas>`;
+}
+
+// Translations
+const DIC = [
+  'Milk Distributor ERP', 'दूध वितरक ईआरपी',
+  'Sign In to ERP', 'लॉगिन करा',
+  'User ID', 'युझर आयडी',
+  'Password', 'पासवर्ड',
+  'Logout', 'लॉगआउट',
+  'Security & Login Credentials', 'सुरक्षितता व लॉगिन माहिती',
+  'Dashboard', 'डॅशबोर्ड',
+  'Today', 'आज',
+  "Today's billed sales", 'आजची बिल विक्री',
+  'Open Daily Register', 'दैनिक नोंदवही उघडा',
+  'Crate Management', 'क्रेट व्यवस्थापन',
+  'Balances & Alerts', 'शिल्लक व सूचना',
+  'Audit Trail', 'ऑडिट नोंदी',
+  'Crates held by retailers', 'विक्रेत्यांकडील क्रेट',
+  'Crates issued today', 'आज दिलेले क्रेट',
+  'Empty crates returned today', 'आज परत आलेले रिकामे क्रेट',
+  'Crate alerts', 'क्रेट सूचना',
+  "Today's milk requirement → crates", 'आजची दूध मागणी → क्रेट',
+  'Milk requirement → crates', 'दूध मागणी → क्रेट',
+  'Milk requirement', 'दूध मागणी',
+  'Retailers needing attention', 'लक्ष देण्यासारखे विक्रेते',
+  'Orders received today', 'आज मिळालेल्या ऑर्डर',
+  'Awaiting confirmation', 'पुष्टीच्या प्रतीक्षेत',
+  'Cash collected', 'जमा रोख',
+  'Online collections', 'ऑनलाईन जमा',
+  'Total outstanding', 'एकूण थकबाकी',
+  'Retailers owing', 'थकबाकी असलेले विक्रेते',
+  'Daily Register', 'दैनिक नोंदवही',
+  'System Date', 'प्रणाली तारीख',
+  'Business date', 'व्यवहार तारीख',
+  'Register:', 'नोंदवही:',
+  'Open', 'खुली',
+  'Finalized', 'अंतिम',
+  'Reopened', 'पुन्हा उघडली',
+  'Order Intake', 'ऑर्डर नोंद',
+  'Milk Requirement', 'दूध मागणी',
+  'Finalize day', 'दिवस अंतिम करा',
+  'Reopen register', 'नोंदवही पुन्हा उघडा',
+  'Daily Bills', 'दैनिक बिल',
+  'Download bill (PNG)', 'बिल डाउनलोड करा (PNG)',
+  'Send Screenshot on WhatsApp', 'स्क्रीनशॉट व्हॉट्सअ‍ॅपवर पाठवा',
+  'Send on WhatsApp', 'व्हॉट्सअ‍ॅपवर पाठवा',
+  'Send Bill on WhatsApp', 'व्हॉट्सअ‍ॅपवर बिल पाठवा',
+  'WhatsApp', 'व्हॉट्सअ‍ॅप',
+  'Print', 'प्रिंट करा',
+  'Payments & Collections', 'पेमेंट व वसुली',
+  'Monthly Record', 'मासिक नोंद (Excel)',
+  'Settings', 'सेटिंग्ज',
+  'Edit', 'संपादित करा',
+  'Delete', 'हटवा',
+  'Actions', 'कृती',
+  'Total crates not returned', 'एकूण परत न आलेले क्रेट',
+  'Bag Retailers (Make 0 Crates)', 'बॅग विक्रेते (० क्रेट करा)',
+  'Zero Out Bag Retailers (No Crates)', 'बॅग विक्रेते (० क्रेट करा)',
+  'Make Selected Retailers 0 Crates', 'निवडलेले विक्रेते ० क्रेट करा',
+  'Takes Milk in Bags (No Crates)', 'थेट पिशवीत दूध (क्रेट नाही)',
+  'Bag Delivery', 'बॅग डिलिव्हरी',
+  'Make It 0', '० क्रेट करा',
+  'Save Changes', 'बदल जतन करा',
+  'Select All', 'सर्व निवडा',
+  'Clear All', 'सर्व काढा',
+  'Total Crates Held Across All Retailers', 'सर्व विक्रेत्यांकडील एकूण क्रेट',
+  'Total Crates Held', 'एकूण शिल्लक क्रेट',
+  'Total crates held', 'एकूण शिल्लक क्रेट',
+  'Total Crates', 'एकूण क्रेट',
+  'Crates Opening', 'मागील बाकी क्रेट',
+  'Crates Issued', 'आज दिलेले क्रेट',
+  'Crates Returned', 'जमा क्रेट',
+  'Crates Closing', 'अखेरची बाकी क्रेट',
+  'Opening', 'मागील बाकी',
+  'Issued', 'आज दिलेले',
+  'Returned', 'जमा क्रेट',
+  'Closing', 'अखेरची बाकी',
+  'Retailers holding crates', 'क्रेट असलेले विक्रेते',
+  'Shop Name', 'दुकानाचे नाव',
+  'Mobile Number', 'मोबाईल नंबर',
+  'Crates Left', 'बाकी क्रेट',
+  'WhatsApp Reminder', 'व्हॉट्सअ‍ॅप स्मरणपत्र',
+  'Pouches ordered', 'मागवलेली पाकिटे',
+  'Pouches Ordered', 'मागवलेली पाकिटे',
+  'Crates Required', 'लागणारे क्रेट',
+  'Total Requirement', 'एकूण मागणी',
+  'Billed sales', 'बिल विक्री',
+  'Crates issued', 'दिलेले क्रेट',
+  'Empty crates returned', 'परत आलेले रिकामे क्रेट',
+  'Reset to Today', 'आजची तारीख',
+  'Click to view list', 'यादी पाहण्यासाठी क्लिक करा',
+  'Date', 'तारीख',
+  'Brand', 'ब्रँड',
+  'Product', 'उत्पादन',
+  'Pouches/crate', 'पाकिटे/क्रेट',
+  'Full crates + loose', 'पूर्ण क्रेट + सुटे',
+  'Sales value', 'विक्री मूल्य',
+  'pouches', 'पाकिटे',
+  'Pouches', 'पाकिटे',
+  'Gokul', 'गोकुळ',
+  'Chitale', 'चितळे',
+  'Amul', 'अमुल',
+  'Shivanand', 'शिवानंद',
+  'Nature', 'नेचर',
+  'Govind', 'गोविंद',
+  'Thorat', 'थोरात',
+  'Warna', 'वारणा',
+  'Cow', 'गाय',
+  'Tea Special', 'टी स्पेशल',
+  'Taaza', 'ताझा',
+  'Gold', 'गोल्ड',
+  'Dahi', 'दही',
+  'Tak', 'ताक',
+  'Standard', 'स्टँडर्ड'
+];
+let DK = [];
+for (let i = 0; i < DIC.length; i += 2) DK.push([new RegExp('(?<![A-Za-z])' + DIC[i].replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '(?![A-Za-z])', 'g'), DIC[i + 1], DIC[i].length]);
+DK.sort((a, b) => b[2] - a[2]);
+const trs = s => S.cfg.mr ? DK.reduce((a, k) => a.replace(k[0], () => k[1]), s) : s;
+function tr(root) {
+  if (!S.cfg.mr || !root) return;
+  const w = document.createTreeWalker(root, NodeFilter.SHOW_TEXT), L = [];
+  let n;
+  while (n = w.nextNode()) L.push(n);
+  L.forEach(n => { if (/[A-Za-z]/.test(n.nodeValue)) n.nodeValue = trs(n.nodeValue); });
+  root.querySelectorAll('[placeholder]').forEach(e => e.placeholder = trs(e.placeholder));
+}
+const _sm = HTMLDialogElement.prototype.showModal;
+HTMLDialogElement.prototype.showModal = function() { tr(this); _sm.call(this); };
+const _cf = window.confirm.bind(window), _pr = window.prompt.bind(window);
+window.confirm = m => _cf(trs(m));
+window.prompt = m => _pr(trs(m));
+
+document.addEventListener('click', e => {
+  if (e.target && e.target.matches && e.target.matches('input[type="date"]')) {
+    try { e.target.showPicker(); } catch(err) {}
+  }
+});
+
+setTimeout(() => check15DayAutoBackup(), 1500);
+setInterval(() => check15DayAutoBackup(), 3600000);
+go();
+</script></body></html>
